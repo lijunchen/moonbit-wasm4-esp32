@@ -1,0 +1,15 @@
+{
+    "import": [
+        "moonbitlang/wasm4"
+    ],
+    "link": {
+        "wasm": {
+            "exports": [
+                "start",
+                "upd:update"
+            ],
+            "export-memory-name": "memory",
+            "heap-start-address": 6560
+        }
+    }
+}
