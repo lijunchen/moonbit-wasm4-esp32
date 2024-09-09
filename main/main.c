@@ -27,6 +27,11 @@
 #include "lcd.h"
 #include <esp_task_wdt.h>
 #include <esp_system.h>
+#include <nvs_flash.h>
+#include "esp_http_server.h"
+#include "wifi.h"
+#include "http.h"
+
 
 #define INTERVAL 400
 #define WAIT vTaskDelay(INTERVAL)
@@ -144,7 +149,6 @@ void run_wasm4(void *pvParameters) {
     w4_windowBoot();
 }
 
-
 void app_main(void)
 {
     printf("Hello world!\n");
@@ -176,6 +180,15 @@ void app_main(void)
 
     printf("\nWasm3 v" M3_VERSION " on " CONFIG_IDF_TARGET ", build " __DATE__ " " __TIME__ "\n");
     // run_wasm();
+
+    nvs_flash_init();
+    wifi_init_sta();
+
+    static httpd_handle_t server = NULL;
+
+
+    /* Start the server for the first time */
+    server = start_webserver();
 
     ST7789(NULL);
     FillTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
