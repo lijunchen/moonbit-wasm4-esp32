@@ -8,6 +8,7 @@
 #include "st7789.h"
 #include "lcd.h"
 #include "esp_task_wdt.h"
+#include "control.h"
 
 // static uint32_t pixels[160*160];
 
@@ -19,12 +20,17 @@ void w4_windowBoot () {
     int counter = 0;
     do {
         // Player 1
-        uint8_t gamepad = 0;
+        uint8_t gamepad = get_player_state(0);
+        printf("player 1 state: %d\n", gamepad);
         w4_runtimeSetGamepad(0, gamepad);
 
         // Player 2
-        gamepad = 0;
+        gamepad = get_player_state(1);
+        printf("player 2 state: %d\n", gamepad);
         w4_runtimeSetGamepad(1, gamepad);
+
+        clear_all_player_state();
+
 
         // Mouse handling
         uint8_t mouseButtons = 0;

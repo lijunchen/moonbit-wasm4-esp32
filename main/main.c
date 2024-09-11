@@ -63,6 +63,13 @@ TickType_t FillTest(TFT_t * dev, int width, int height) {
 
 TFT_t dev;
 
+#define CUSTOM_MOSI_GPIO 23
+#define CUSTOM_SCLK_GPIO 20
+#define CUSTOM_CS_GPIO -1
+#define CUSTOM_DC_GPIO 21
+#define CUSTOM_RESET_GPIO 22
+#define CUSTOM_BL_GPIO -1
+
 void ST7789(void *pvParameters)
 {
     // set font file
@@ -86,7 +93,7 @@ void ST7789(void *pvParameters)
     //spi_clock_speed(40000000); // 40MHz
     //spi_clock_speed(60000000); // 60MHz
 
-    spi_master_init(&dev, CONFIG_MOSI_GPIO, CONFIG_SCLK_GPIO, CONFIG_CS_GPIO, CONFIG_DC_GPIO, CONFIG_RESET_GPIO, CONFIG_BL_GPIO);
+    spi_master_init(&dev, CUSTOM_MOSI_GPIO, CUSTOM_SCLK_GPIO, CUSTOM_CS_GPIO, CUSTOM_DC_GPIO, CUSTOM_RESET_GPIO, CUSTOM_BL_GPIO);
     lcdInit(&dev, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY);
 
     lcdFillScreen(&dev, BLACK);

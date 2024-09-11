@@ -18,7 +18,9 @@ set(APP_SOURCES
     "wasm_wasm3.c"
     "protocol_examples_utils.c"
     "wifi.c"
-    "http.c")
+    "http.c"
+    "control.c"
+    )
 
 idf_component_register(SRCS ${APP_SOURCES}
                        INCLUDE_DIRS ""
