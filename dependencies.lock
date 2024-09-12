@@ -1,4 +1,14 @@
 dependencies:
+  espressif/button:
+    component_hash: c3ee3ba339a3848977496d0157008ae574a24fc59f54d27c93ab51b14446a2fb
+    source:
+      type: service
+    version: 3.3.1
+  espressif/cmake_utilities:
+    component_hash: 351350613ceafba240b761b4ea991e0f231ac7a9f59a9ee901f751bddc0bb18f
+    source:
+      type: service
+    version: 0.5.3
   idf:
     component_hash: null
     source:
@@ -10,6 +20,6 @@ dependencies:
       path: C:\Users\li\git\wasm-micro-runtime
       type: local
     version: 2.0.0
-manifest_hash: 18a3f9157d08be4022bdcf78088e78f82e1a72434241a1ad9d53d8fbf99c80a5
+manifest_hash: cb93f75c9d3e9a3bbbdfad04315f2990de283ca36e903d760813461eb215dd69
 target: esp32c6
 version: 1.0.0

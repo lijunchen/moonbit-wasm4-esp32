@@ -1,5 +1,6 @@
 ## IDF Component Manager Manifest File
 dependencies:
+  espressif/button: "^3.3.1"
   wasm-micro-runtime:
     version: "^2"
     override_path: "C:/Users/li/git/wasm-micro-runtime"

@@ -32,6 +32,7 @@
 #include "wifi.h"
 #include "http.h"
 #include "wamr.h"
+#include "iot_button.h"
 
 #define INTERVAL 400
 #define WAIT vTaskDelay(INTERVAL)
@@ -162,6 +163,31 @@ void run_wasm4(void *pvParameters) {
     w4_windowBoot();
 }
 
+extern void set_player_state(int player, uint8_t state);
+
+static void button_left(void* arg, void* usr_data)
+{
+    printf("set player 0 state to 16\n");
+    set_player_state(0, 16);
+}
+
+static void button_right(void* arg, void* usr_data)
+{
+    printf("set player 0 state to 32\n");
+    set_player_state(0, 32);
+}
+
+static void button_up(void* arg, void* usr_data)
+{
+    printf("set player 0 state to 64\n");
+    set_player_state(0, 64);
+}
+
+static void button_down(void* arg, void* usr_data)
+{
+    printf("set player 0 state to 128\n");
+    set_player_state(0, 128);
+}
 
 
 void app_main(void)
@@ -195,6 +221,24 @@ void app_main(void)
 
     // printf("\nWasm3 v" M3_VERSION " on " CONFIG_IDF_TARGET ", build " __DATE__ " " __TIME__ "\n");
     // run_wasm();
+
+    // create gpio button
+    button_config_t gpio_btn_cfg = {
+        .type = BUTTON_TYPE_GPIO,
+        .long_press_time = CONFIG_BUTTON_LONG_PRESS_TIME_MS,
+        .short_press_time = CONFIG_BUTTON_SHORT_PRESS_TIME_MS,
+        .gpio_button_config = {
+            .gpio_num = GPIO_NUM_9,
+            .active_level = 0,
+        },
+    };
+    button_handle_t gpio_btn = iot_button_create(&gpio_btn_cfg);
+    if (NULL == gpio_btn) {
+        printf("Button create failed\n");
+    }
+
+    iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_down, (void *)BUTTON_SINGLE_CLICK);
+    iot_button_register_cb(gpio_btn, BUTTON_DOUBLE_CLICK, button_right, (void *)BUTTON_DOUBLE_CLICK);
 
     nvs_flash_init();
     // wifi_init_sta();
