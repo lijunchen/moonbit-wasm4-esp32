@@ -146,16 +146,18 @@ void w4_windowBoot ();
 
 uint16_t last[160*160];
 
+extern void* wamr_get_phy_memory();
+
 void run_wasm4(void *pvParameters) {
     w4_Disk disk = {0};
     printf("Step 0\n");
     int len = __tinypong_wasm_len;
     printf("Step 1\n");
-    uint8_t* memory = w4_wasmInit();
-    printf("Step 2\n");
+    uint8_t* memory = wamr_get_phy_memory();
+    printf("Step 2, memory %p\n", memory);
     w4_runtimeInit(memory, &disk);
     printf("Step 3\n");
-    w4_wasmLoadModule(__tinypong_wasm, len);
+    // w4_wasmLoadModule(__tinypong_wasm, len);
     printf("Step 4");
     w4_windowBoot();
 }
@@ -225,7 +227,7 @@ void app_main(void)
 
     // run_wasm4(NULL);
 
-    // xTaskCreate(run_wasm4, "wasm4", 1024*6, NULL, 2, NULL);
+    xTaskCreate(run_wasm4, "wasm4", 1024*6, NULL, 2, NULL);
 
     while (1) {
         printf("Main loop is running\n");

@@ -46,7 +46,7 @@ void w4_runtimeInit (uint8_t* memoryBytes, w4_Disk* diskBytes) {
     firstFrame = true;
 
     // Set memory to initial state
-    memset(memory, 0, 1 << 16);
+    memset(memory, 0, 6560);
     w4_write32LE(&memory->palette[0], 0xe0f8cf);
     w4_write32LE(&memory->palette[1], 0x86c06c);
     w4_write32LE(&memory->palette[2], 0x306850);

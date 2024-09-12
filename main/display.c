@@ -21,12 +21,12 @@ void w4_windowBoot () {
     do {
         // Player 1
         uint8_t gamepad = get_player_state(0);
-        printf("player 1 state: %d\n", gamepad);
+        // printf("player 1 state: %d\n", gamepad);
         w4_runtimeSetGamepad(0, gamepad);
 
         // Player 2
         gamepad = get_player_state(1);
-        printf("player 2 state: %d\n", gamepad);
+        // printf("player 2 state: %d\n", gamepad);
         w4_runtimeSetGamepad(1, gamepad);
 
         clear_all_player_state();

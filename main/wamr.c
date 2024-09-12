@@ -2,54 +2,71 @@
 #include "runtime.h"
 
 void wrap_w4_runtimeBlit(wasm_exec_env_t exec_env, const uint8_t* sprite, int x, int y, int width, int height, int flags) {
+    // printf("Call wrap_w4_runtimeBlit\n");
     w4_runtimeBlit(sprite, x, y, width, height, flags);
 }
 void wrap_w4_runtimeBlitSub(wasm_exec_env_t exec_env, const uint8_t* sprite, int x, int y, int width, int height, int srcX, int srcY, int stride, int flags) {
+    // printf("Call wrap_w4_runtimeBlitSub\n");
     w4_runtimeBlitSub(sprite, x, y, width, height, srcX, srcY, stride, flags);
 }
 void wrap_w4_runtimeLine(wasm_exec_env_t exec_env, int x1, int y1, int x2, int y2) {
+    // printf("Call wrap_w4_runtimeLine\n");
     w4_runtimeLine(x1, y1, x2, y2);
 }
 void wrap_w4_runtimeHLine(wasm_exec_env_t exec_env, int x, int y, int len) {
+    // printf("Call wrap_w4_runtimeHLine\n");
     w4_runtimeHLine(x, y, len);
 }
 void wrap_w4_runtimeVLine(wasm_exec_env_t exec_env, int x, int y, int len) {
+    // printf("Call wrap_w4_runtimeVLine\n");
     w4_runtimeVLine(x, y, len);
 }
 void wrap_w4_runtimeOval(wasm_exec_env_t exec_env, int x, int y, int width, int height) {
+    // printf("Call wrap_w4_runtimeOval\n");
     w4_runtimeOval(x, y, width, height);
 }
 void wrap_w4_runtimeRect(wasm_exec_env_t exec_env, int x, int y, int width, int height) {
+    // printf("Call wrap_w4_runtimeRect\n");
     w4_runtimeRect(x, y, width, height);
 }
 void wrap_w4_runtimeText(wasm_exec_env_t exec_env, const uint8_t* str, int x, int y) {
+    // printf("Call wrap_w4_runtimeText\n");
     w4_runtimeText(str, x, y);
 }
 void wrap_w4_runtimeTextUtf8(wasm_exec_env_t exec_env, const uint8_t* str, int byteLength, int x, int y) {
+    // printf("Call wrap_w4_runtimeTextUtf8\n");
     w4_runtimeTextUtf8(str, byteLength, x, y);
 }
 void wrap_w4_runtimeTextUtf16(wasm_exec_env_t exec_env, const uint16_t* str, int byteLength, int x, int y) {
+    // printf("Call wrap_w4_runtimeTextUtf16\n");
     w4_runtimeTextUtf16(str, byteLength, x, y);
 }
 void wrap_w4_runtimeTone(wasm_exec_env_t exec_env, int frequency, int duration, int volume, int flags) {
+    // printf("Call wrap_w4_runtimeTone\n");
     w4_runtimeTone(frequency, duration, volume, flags);
 }
 int wrap_w4_runtimeDiskr(wasm_exec_env_t exec_env, uint8_t* dest, int size) {
+    // printf("Call wrap_w4_runtimeDiskr\n");
     return w4_runtimeDiskr(dest, size);
 }
 int wrap_w4_runtimeDiskw(wasm_exec_env_t exec_env, const uint8_t* src, int size) {
+    // printf("Call wrap_w4_runtimeDiskw\n");
     return w4_runtimeDiskw(src, size);
 }
 void wrap_w4_runtimeTrace(wasm_exec_env_t exec_env, const uint8_t* str) {
+    // printf("Call wrap_w4_runtimeTrace\n");
     w4_runtimeTrace(str);
 }
 void wrap_w4_runtimeTraceUtf8(wasm_exec_env_t exec_env, const uint8_t* str, int byteLength) {
+    // printf("Call wrap_w4_runtimeTraceUtf8\n");
     w4_runtimeTraceUtf8(str, byteLength);
 }
 void wrap_w4_runtimeTraceUtf16(wasm_exec_env_t exec_env, const uint16_t* str, int byteLength) {
+    // printf("Call wrap_w4_runtimeTraceUtf16\n");
     w4_runtimeTraceUtf16(str, byteLength);
 }
 void wrap_w4_runtimeTracef(wasm_exec_env_t exec_env, const uint8_t* str, const void* stack) {
+    // printf("Call wrap_w4_runtimeTracef\n");
     w4_runtimeTracef(str, stack);
 }
 
@@ -108,12 +125,12 @@ static NativeSymbol native_symbols[] =
     {
         "textUtf8",
      	wrap_w4_runtimeTextUtf8,
-        "(*~ii)"
+        "(iiii)"
     },
     {
         "textUtf16",
      	wrap_w4_runtimeTextUtf16,
-        "(*~ii)"
+        "(iiii)"
     },
 
     {
@@ -125,44 +142,52 @@ static NativeSymbol native_symbols[] =
     {
         "diskr",
      	wrap_w4_runtimeDiskr,
-        "(*~)i"
+        "(ii)i"
     },
     {
         "diskw",
      	wrap_w4_runtimeDiskw,
-        "(*~)i"
+        "(ii)i"
     },
 
     {
         "trace",
      	wrap_w4_runtimeTrace,
-        "(*)"
+        "(i)"
     },
 
     {
         "traceUtf8",
      	wrap_w4_runtimeTraceUtf8,
-        "(*~)"
+        "(ii)"
     },
     {
         "traceUtf16",
      	wrap_w4_runtimeTraceUtf16,
-        "(*~)"
+        "(ii)"
     },
     {
         "tracef",
      	wrap_w4_runtimeTracef,
-        "($*)"
+        "(ii)"
     },
 };
 
 extern unsigned char __tinypong_wasm[];
 extern unsigned int __tinypong_wasm_len;
 
+wasm_module_t wasm_module = NULL;
+wasm_module_inst_t wasm_module_inst = NULL;
+wasm_function_inst_t start = NULL;
+wasm_function_inst_t update = NULL;
+wasm_exec_env_t exec_env = NULL;
+wasm_exec_env_t exec_env2 = NULL;
+
+extern void run_wasm4(void *pvParameters);
+
 void init_wamr() {
     /* Setup variables for instantiating and running the wasm module */
-    wasm_module_t wasm_module = NULL;
-    wasm_module_inst_t wasm_module_inst = NULL;
+
     char error_buf[128];
     RuntimeInitArgs init_args;
 
@@ -208,28 +233,55 @@ void init_wamr() {
     }
 
     printf("Instantiate the wasm module\n");
-    wasm_module_inst = wasm_runtime_instantiate(wasm_module, 16 * 1024, 16 * 1024, error_buf, sizeof(error_buf));
+    wasm_module_inst = wasm_runtime_instantiate(wasm_module, 64 * 1024, 64 * 1024, error_buf, sizeof(error_buf));
     if (!wasm_module_inst) {
         printf("Failed to instantiate wasm module: %s\n", error_buf);
         wasm_runtime_unload(wasm_module);
         return;
     }
 
-
-    printf("Call the wasm function if needed\n");
-    wasm_function_inst_t start = wasm_runtime_lookup_function(wasm_module_inst, "start");
+    start = wasm_runtime_lookup_function(wasm_module_inst, "start");
     printf("start: %p\n", start);
-    wasm_function_inst_t update = wasm_runtime_lookup_function(wasm_module_inst, "update");
+
+    update = wasm_runtime_lookup_function(wasm_module_inst, "update");
     printf("update: %p\n", update);
-    wasm_exec_env_t exec_env = wasm_runtime_create_exec_env(wasm_module_inst, 2 * 1024);
-    int ret = wasm_runtime_call_wasm(exec_env, start, 0, NULL);
-    if (!ret) {
-        printf("Failed to call wasm function [start].\n");
+
+
+    exec_env = wasm_runtime_create_exec_env(wasm_module_inst, 2 * 1024);
+
+    wasm_function_inst_t tmp = wasm_runtime_lookup_function(wasm_module_inst, "_start");
+    if (tmp) {
+        wasm_runtime_call_wasm(exec_env, tmp, 0, NULL);
+    }
+    tmp = wasm_runtime_lookup_function(wasm_module_inst, "_initialize");
+    if (tmp) {
+        wasm_runtime_call_wasm(exec_env, tmp, 0, NULL);
     }
 
+    run_wasm4(NULL);
+
     /* Clean up */
-    wasm_runtime_deinstantiate(wasm_module_inst);
-    wasm_runtime_unload(wasm_module);
-    wasm_runtime_destroy();
-    printf("WASM runtime destroyed.\n");
+    // wasm_runtime_deinstantiate(wasm_module_inst);
+    // wasm_runtime_unload(wasm_module);
+    // wasm_runtime_destroy();
+    // printf("WASM runtime destroyed.\n");
+}
+
+void* wamr_get_phy_memory() {
+    return wasm_runtime_addr_app_to_native(wasm_module_inst, 0);
+}
+
+void w4_wasmCallStart () {
+    if (start) {
+        printf("Call start %p\n", start);
+        wasm_runtime_call_wasm(exec_env, start, 0, NULL);
+    }
+}
+
+void w4_wasmCallUpdate () {
+    update = wasm_runtime_lookup_function(wasm_module_inst, "update");
+    if (!exec_env2) {
+        exec_env2 = wasm_runtime_create_exec_env(wasm_module_inst, 10 * 1024);
+    }
+    wasm_runtime_call_wasm(exec_env2, update, 0, NULL); 
 }
