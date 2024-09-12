@@ -1,0 +1,7 @@
+## IDF Component Manager Manifest File
+dependencies:
+  wasm-micro-runtime:
+    version: "^2"
+    override_path: "C:/Users/li/git/wasm-micro-runtime"
+  idf:
+    version: ">=4.4"

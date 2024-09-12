@@ -31,11 +31,12 @@
 #include "esp_http_server.h"
 #include "wifi.h"
 #include "http.h"
-
+#include "wamr.h"
 
 #define INTERVAL 400
 #define WAIT vTaskDelay(INTERVAL)
 
+#define IWASM_MAIN_STACK_SIZE 5120
 
 TickType_t FillTest(TFT_t * dev, int width, int height) {
     TickType_t startTick, endTick, diffTick;
@@ -147,14 +148,19 @@ uint16_t last[160*160];
 
 void run_wasm4(void *pvParameters) {
     w4_Disk disk = {0};
+    printf("Step 0\n");
     int len = __tinypong_wasm_len;
-    unsigned char* wasm = xmalloc(len);
-    memcpy(wasm, __tinypong_wasm, len);
+    printf("Step 1\n");
     uint8_t* memory = w4_wasmInit();
+    printf("Step 2\n");
     w4_runtimeInit(memory, &disk);
-    w4_wasmLoadModule(wasm, len);
+    printf("Step 3\n");
+    w4_wasmLoadModule(__tinypong_wasm, len);
+    printf("Step 4");
     w4_windowBoot();
 }
+
+
 
 void app_main(void)
 {
@@ -185,22 +191,41 @@ void app_main(void)
 
     printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
 
-    printf("\nWasm3 v" M3_VERSION " on " CONFIG_IDF_TARGET ", build " __DATE__ " " __TIME__ "\n");
+    // printf("\nWasm3 v" M3_VERSION " on " CONFIG_IDF_TARGET ", build " __DATE__ " " __TIME__ "\n");
     // run_wasm();
 
     nvs_flash_init();
-    wifi_init_sta();
+    // wifi_init_sta();
+
+    ST7789(NULL);
+    FillTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
+    
+    printf("WAMR test begin\n");
+
+    pthread_t t;
+    int res;
+
+    pthread_attr_t tattr;
+    pthread_attr_init(&tattr);
+    pthread_attr_setdetachstate(&tattr, PTHREAD_CREATE_JOINABLE);
+    pthread_attr_setstacksize(&tattr, IWASM_MAIN_STACK_SIZE);
+
+    res = pthread_create(&t, &tattr, init_wamr, (void *)NULL);
+    assert(res == 0);
+
+    res = pthread_join(t, NULL);
+    assert(res == 0);
 
     static httpd_handle_t server = NULL;
 
 
     /* Start the server for the first time */
-    server = start_webserver();
+    // server = start_webserver();
 
-    ST7789(NULL);
-    FillTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
 
-    xTaskCreate(run_wasm4, "wasm4", 1024*6, NULL, 2, NULL);
+    // run_wasm4(NULL);
+
+    // xTaskCreate(run_wasm4, "wasm4", 1024*6, NULL, 2, NULL);
 
     while (1) {
         printf("Main loop is running\n");

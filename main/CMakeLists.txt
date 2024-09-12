@@ -20,11 +20,13 @@ set(APP_SOURCES
     "wifi.c"
     "http.c"
     "control.c"
+    "wamr.c"
     )
 
 idf_component_register(SRCS ${APP_SOURCES}
                        INCLUDE_DIRS ""
-                       LDFRAGMENTS linker.lf)
+                       LDFRAGMENTS linker.lf
+                       INCLUDE_DIRS ".")
 
 if (idf_ver STREQUAL "4.0")
     # IDF v4.0 links apps with -nostdlib, so need to explicitly list the dependencies.
