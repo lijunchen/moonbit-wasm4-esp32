@@ -9,6 +9,7 @@
 #include "lcd.h"
 #include "esp_task_wdt.h"
 #include "control.h"
+#include "wasm_export.h"
 
 // static uint32_t pixels[160*160];
 
@@ -16,9 +17,19 @@ static int viewportX = 0;
 static int viewportY = 0;
 static int viewportSize = 3*160;
 
+
+extern wasm_module_t wasm_module;
+extern wasm_module_inst_t wasm_module_inst;
+extern wasm_function_inst_t start;
+extern wasm_function_inst_t update;
+extern wasm_exec_env_t exec_env;
+
 void w4_windowBoot () {
     int counter = 0;
     do {
+        if (!wasm_module_inst || !start || !update || !exec_env) {
+            continue;
+        }
         // Player 1
         uint8_t gamepad = get_player_state(0);
         // printf("player 1 state: %d\n", gamepad);

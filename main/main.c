@@ -189,6 +189,12 @@ static void button_down(void* arg, void* usr_data)
     set_player_state(0, 128);
 }
 
+static void button_x(void* arg, void* usr_data)
+{
+    printf("set player 0 state to 1\n");
+    set_player_state(0, 1);
+}
+
 
 void app_main(void)
 {
@@ -239,6 +245,7 @@ void app_main(void)
 
     iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_down, (void *)BUTTON_SINGLE_CLICK);
     iot_button_register_cb(gpio_btn, BUTTON_DOUBLE_CLICK, button_right, (void *)BUTTON_DOUBLE_CLICK);
+    iot_button_register_cb(gpio_btn, BUTTON_LONG_PRESS_HOLD, button_x, (void *)BUTTON_LONG_PRESS_HOLD);
 
     nvs_flash_init();
     // wifi_init_sta();

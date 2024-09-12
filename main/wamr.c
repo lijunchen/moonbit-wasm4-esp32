@@ -175,6 +175,8 @@ static NativeSymbol native_symbols[] =
 
 extern unsigned char __tinypong_wasm[];
 extern unsigned int __tinypong_wasm_len;
+extern unsigned char tankle_wasm[];
+extern unsigned int tankle_wasm_len;
 
 wasm_module_t wasm_module = NULL;
 wasm_module_inst_t wasm_module_inst = NULL;
@@ -184,6 +186,32 @@ wasm_exec_env_t exec_env = NULL;
 wasm_exec_env_t exec_env2 = NULL;
 
 extern void run_wasm4(void *pvParameters);
+
+void load_tinypong() {
+    char error_buf[128];
+    wasm_module = wasm_runtime_load(__tinypong_wasm, __tinypong_wasm_len, error_buf, sizeof(error_buf));
+    if (!wasm_module) {
+        printf("Failed to load wasm module: %s\n", error_buf);
+        return;
+    }
+
+    printf("Instantiate the wasm module\n");
+    wasm_module_inst = wasm_runtime_instantiate(wasm_module, 16 * 1024, 64 * 1024, error_buf, sizeof(error_buf));
+    if (!wasm_module_inst) {
+        printf("Failed to instantiate wasm module: %s\n", error_buf);
+        wasm_runtime_unload(wasm_module);
+        return;
+    }
+
+    start = wasm_runtime_lookup_function(wasm_module_inst, "start");
+    printf("start: %p\n", start);
+
+    update = wasm_runtime_lookup_function(wasm_module_inst, "update");
+    printf("update: %p\n", update);
+
+
+    exec_env = wasm_runtime_create_exec_env(wasm_module_inst, 2 * 1024);
+}
 
 void init_wamr() {
     /* Setup variables for instantiating and running the wasm module */
@@ -214,49 +242,11 @@ void init_wamr() {
     printf("Load the wasm module from memory\n");
     printf("tinywasm: %p, len: %d\n", __tinypong_wasm, __tinypong_wasm_len);
     int count = 0;
-    // for (int i = 0; i < __tinypong_wasm_len; i++) {
-    //     count += __tinypong_wasm[i];
-    // }
-    // printf("count: %d\n", count);
-    // count = 0;
-    // for (int i = 0; i < __tinypong_wasm_len; i++) {
-    //     __tinypong_wasm[i] = __tinypong_wasm[i];
-    //     count += __tinypong_wasm[i];
-    // }
     printf("count: %d\n", count);
     printf("memory test done\n");
     heap_caps_print_heap_info(MALLOC_CAP_8BIT);
-    wasm_module = wasm_runtime_load(__tinypong_wasm, __tinypong_wasm_len, error_buf, sizeof(error_buf));
-    if (!wasm_module) {
-        printf("Failed to load wasm module: %s\n", error_buf);
-        return;
-    }
 
-    printf("Instantiate the wasm module\n");
-    wasm_module_inst = wasm_runtime_instantiate(wasm_module, 64 * 1024, 64 * 1024, error_buf, sizeof(error_buf));
-    if (!wasm_module_inst) {
-        printf("Failed to instantiate wasm module: %s\n", error_buf);
-        wasm_runtime_unload(wasm_module);
-        return;
-    }
-
-    start = wasm_runtime_lookup_function(wasm_module_inst, "start");
-    printf("start: %p\n", start);
-
-    update = wasm_runtime_lookup_function(wasm_module_inst, "update");
-    printf("update: %p\n", update);
-
-
-    exec_env = wasm_runtime_create_exec_env(wasm_module_inst, 2 * 1024);
-
-    wasm_function_inst_t tmp = wasm_runtime_lookup_function(wasm_module_inst, "_start");
-    if (tmp) {
-        wasm_runtime_call_wasm(exec_env, tmp, 0, NULL);
-    }
-    tmp = wasm_runtime_lookup_function(wasm_module_inst, "_initialize");
-    if (tmp) {
-        wasm_runtime_call_wasm(exec_env, tmp, 0, NULL);
-    }
+    load_tinypong();
 
     run_wasm4(NULL);
 

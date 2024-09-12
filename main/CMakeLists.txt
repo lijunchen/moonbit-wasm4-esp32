@@ -21,6 +21,7 @@ set(APP_SOURCES
     "http.c"
     "control.c"
     "wamr.c"
+    "tankle.c"
     )
 
 idf_component_register(SRCS ${APP_SOURCES}
