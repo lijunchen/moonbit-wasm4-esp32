@@ -229,23 +229,71 @@ void app_main(void)
     // run_wasm();
 
     // create gpio button
-    button_config_t gpio_btn_cfg = {
-        .type = BUTTON_TYPE_GPIO,
-        .long_press_time = CONFIG_BUTTON_LONG_PRESS_TIME_MS,
-        .short_press_time = CONFIG_BUTTON_SHORT_PRESS_TIME_MS,
-        .gpio_button_config = {
-            .gpio_num = GPIO_NUM_9,
-            .active_level = 0,
-        },
-    };
-    button_handle_t gpio_btn = iot_button_create(&gpio_btn_cfg);
-    if (NULL == gpio_btn) {
-        printf("Button create failed\n");
+    {
+        button_config_t gpio_btn_cfg = {
+            .type = BUTTON_TYPE_GPIO,
+            .long_press_time = CONFIG_BUTTON_LONG_PRESS_TIME_MS,
+            .short_press_time = 100,
+            .gpio_button_config = {
+                .gpio_num = GPIO_NUM_2,
+                .active_level = 0,
+            },
+        };
+        button_handle_t gpio_btn = iot_button_create(&gpio_btn_cfg);
+        if (NULL == gpio_btn) {
+            printf("Button create failed\n");
+        }
+        iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_up, (void *)BUTTON_SINGLE_CLICK);
+    }
+    {
+        button_config_t gpio_btn_cfg = {
+            .type = BUTTON_TYPE_GPIO,
+            .long_press_time = CONFIG_BUTTON_LONG_PRESS_TIME_MS,
+            .short_press_time = 100,
+            .gpio_button_config = {
+                .gpio_num = GPIO_NUM_3,
+                .active_level = 0,
+            },
+        };
+        button_handle_t gpio_btn = iot_button_create(&gpio_btn_cfg);
+        if (NULL == gpio_btn) {
+            printf("Button create failed\n");
+        }
+        iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_right, (void *)BUTTON_SINGLE_CLICK);
+    }
+    {
+        button_config_t gpio_btn_cfg = {
+            .type = BUTTON_TYPE_GPIO,
+            .long_press_time = CONFIG_BUTTON_LONG_PRESS_TIME_MS,
+            .short_press_time = 100,
+            .gpio_button_config = {
+                .gpio_num = GPIO_NUM_10,
+                .active_level = 0,
+            },
+        };
+        button_handle_t gpio_btn = iot_button_create(&gpio_btn_cfg);
+        if (NULL == gpio_btn) {
+            printf("Button create failed\n");
+        }
+        iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_left, (void *)BUTTON_SINGLE_CLICK);
+    }
+    {
+        button_config_t gpio_btn_cfg = {
+            .type = BUTTON_TYPE_GPIO,
+            .long_press_time = CONFIG_BUTTON_LONG_PRESS_TIME_MS,
+            .short_press_time = 100,
+            .gpio_button_config = {
+                .gpio_num = GPIO_NUM_11,
+                .active_level = 0,
+            },
+        };
+        button_handle_t gpio_btn = iot_button_create(&gpio_btn_cfg);
+        if (NULL == gpio_btn) {
+            printf("Button create failed\n");
+        }
+        iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_down, (void *)BUTTON_SINGLE_CLICK);
     }
 
-    iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_down, (void *)BUTTON_SINGLE_CLICK);
-    iot_button_register_cb(gpio_btn, BUTTON_DOUBLE_CLICK, button_right, (void *)BUTTON_DOUBLE_CLICK);
-    iot_button_register_cb(gpio_btn, BUTTON_LONG_PRESS_HOLD, button_x, (void *)BUTTON_LONG_PRESS_HOLD);
 
     nvs_flash_init();
     // wifi_init_sta();
