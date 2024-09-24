@@ -19,7 +19,6 @@
 #include "wasm3.h"
 #include "fib32.wasm.h"
 
-#include "apu.h"
 #include "runtime.h"
 #include "wasm0.h"
 #include "window.h"

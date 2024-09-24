@@ -8,7 +8,6 @@ endif()
 
 set(APP_SOURCES
     "main.c"
-    "apu.c"
     "display.c"
     "framebuffer.c"
     "runtime.c"

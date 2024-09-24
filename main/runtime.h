@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RUNTIME_H
+#define RUNTIME_H
 
 #include <stdint.h>
 
@@ -51,3 +52,5 @@ void w4_runtimeUpdate ();
 int w4_runtimeSerializeSize ();
 void w4_runtimeSerialize (void* dest);
 void w4_runtimeUnserialize (const void* src);
+
+#endif
