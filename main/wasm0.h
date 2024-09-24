@@ -1,4 +1,5 @@
-#pragma once
+#ifndef WASM0_H
+#define WASM0_H
 
 #include <stdint.h>
 
@@ -9,3 +10,5 @@ void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength);
 
 void w4_wasmCallStart ();
 void w4_wasmCallUpdate ();
+
+#endif

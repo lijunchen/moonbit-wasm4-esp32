@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UTIL_H
+#define UTIL_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -12,3 +13,5 @@ uint32_t w4_read32LE (const uint32_t* ptr);
 
 void w4_write16LE (uint16_t* ptr, uint16_t value);
 void w4_write32LE (uint32_t* ptr, uint32_t value);
+
+#endif

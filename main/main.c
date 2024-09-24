@@ -25,8 +25,6 @@
 #include <esp_system.h>
 #include <nvs_flash.h>
 #include "esp_http_server.h"
-#include "wifi.h"
-#include "http.h"
 #include "wamr.h"
 #include "iot_button.h"
 

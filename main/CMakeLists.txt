@@ -10,9 +10,6 @@ set(APP_SOURCES
     "tinypong.c"
     "util.c"
    
-    "protocol_examples_utils.c"
-    "wifi.c"
-    "http.c"
     "control.c"
     "wamr.c"
     )

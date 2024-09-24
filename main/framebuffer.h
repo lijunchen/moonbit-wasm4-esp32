@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FRAMEBUFFER_H
+#define FRAMEBUFFER_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -26,3 +27,5 @@ void w4_framebufferTextUtf16 (const uint16_t* str, int byteLength, int x, int y)
 
 void w4_framebufferBlit (const uint8_t* sprite, int dstX, int dstY, int width, int height,
     int srcX, int srcY, int srcStride, bool bpp2, bool flipX, bool flipY, bool rotate);
+
+#endif
