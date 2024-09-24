@@ -7,9 +7,8 @@ set(APP_SOURCES
     "framebuffer.c"
     "runtime.c"
     "strnlen.c"
-    "tinypong.c"
+    "gamecard.c"
     "util.c"
-   
     "control.c"
     "wamr.c"
     )

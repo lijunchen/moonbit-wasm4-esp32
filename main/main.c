@@ -30,8 +30,8 @@
 #define FATAL(msg, ...) { printf("Fatal: " msg "\n", ##__VA_ARGS__); return; }
 
 
-extern unsigned char __tinypong_wasm[];
-extern unsigned int __tinypong_wasm_len;
+extern unsigned char __game_card[];
+extern unsigned int __game_card_len;
 
 void w4_windowBoot ();
 

@@ -173,10 +173,8 @@ static NativeSymbol native_symbols[] =
     },
 };
 
-extern unsigned char __tinypong_wasm[];
-extern unsigned int __tinypong_wasm_len;
-extern unsigned char tankle_wasm[];
-extern unsigned int tankle_wasm_len;
+extern unsigned char __game_card[];
+extern unsigned int __game_card_len;
 
 wasm_module_t wasm_module = NULL;
 wasm_module_inst_t wasm_module_inst = NULL;
@@ -189,7 +187,7 @@ extern void run_wasm4(void *pvParameters);
 
 void load_tinypong() {
     char error_buf[128];
-    wasm_module = wasm_runtime_load(__tinypong_wasm, __tinypong_wasm_len, error_buf, sizeof(error_buf));
+    wasm_module = wasm_runtime_load(__tinypong_wasm, __game_card_len, error_buf, sizeof(error_buf));
     if (!wasm_module) {
         printf("Failed to load wasm module: %s\n", error_buf);
         return;
@@ -240,7 +238,7 @@ void init_wamr() {
     }
 
     printf("Load the wasm module from memory\n");
-    printf("tinywasm: %p, len: %d\n", __tinypong_wasm, __tinypong_wasm_len);
+    printf("tinywasm: %p, len: %d\n", __game_card, __game_card_len);
     int count = 0;
     printf("count: %d\n", count);
     printf("memory test done\n");
