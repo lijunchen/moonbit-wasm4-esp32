@@ -187,7 +187,7 @@ extern void run_wasm4(void *pvParameters);
 
 void load_tinypong() {
     char error_buf[128];
-    wasm_module = wasm_runtime_load(__tinypong_wasm, __game_card_len, error_buf, sizeof(error_buf));
+    wasm_module = wasm_runtime_load(__game_card, __game_card_len, error_buf, sizeof(error_buf));
     if (!wasm_module) {
         printf("Failed to load wasm module: %s\n", error_buf);
         return;
