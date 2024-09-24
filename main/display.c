@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-#include "window.h"
 #include "runtime.h"
 
 #include "freertos/FreeRTOS.h"
@@ -10,6 +9,7 @@
 #include "esp_task_wdt.h"
 #include "control.h"
 #include "wasm_export.h"
+#include "esp_log.h"
 
 // static uint32_t pixels[160*160];
 
@@ -90,4 +90,66 @@ void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {
             }
         }
     }
+}
+
+TickType_t FillTest(TFT_t * dev, int width, int height) {
+    TickType_t startTick, endTick, diffTick;
+    startTick = xTaskGetTickCount();
+
+    {
+        for (int i = 0; i < 2; i++) {
+            TickType_t startTick, endTick, diffTick;
+            startTick = xTaskGetTickCount();
+            lcdFillScreen(dev, WHITE);
+            lcdFillScreen(dev, GREEN);
+            lcdFillScreen(dev, BLACK);
+            endTick = xTaskGetTickCount();
+            diffTick = endTick - startTick;
+            ESP_LOGI(__FUNCTION__, "write a line elapsed time[ms]:%"PRIu32,diffTick*portTICK_PERIOD_MS);
+        }
+    }
+
+
+    endTick = xTaskGetTickCount();
+    diffTick = endTick - startTick;
+    ESP_LOGI(__FUNCTION__, "elapsed time[ms]:%"PRIu32,diffTick*portTICK_PERIOD_MS);
+    return diffTick;
+}
+
+TFT_t dev;
+
+#define CUSTOM_MOSI_GPIO 23
+#define CUSTOM_SCLK_GPIO 20
+#define CUSTOM_CS_GPIO -1
+#define CUSTOM_DC_GPIO 21
+#define CUSTOM_RESET_GPIO 22
+#define CUSTOM_BL_GPIO -1
+
+void ST7789(void *pvParameters)
+{
+    // set font file
+    FontxFile fx16G[2];
+    FontxFile fx24G[2];
+    FontxFile fx32G[2];
+    FontxFile fx32L[2];
+    InitFontx(fx16G,"/spiffs/ILGH16XB.FNT",""); // 8x16Dot Gothic
+    InitFontx(fx24G,"/spiffs/ILGH24XB.FNT",""); // 12x24Dot Gothic
+    InitFontx(fx32G,"/spiffs/ILGH32XB.FNT",""); // 16x32Dot Gothic
+    InitFontx(fx32L,"/spiffs/LATIN32B.FNT",""); // 16x32Dot Latin
+
+    FontxFile fx16M[2];
+    FontxFile fx24M[2];
+    FontxFile fx32M[2];
+    InitFontx(fx16M,"/spiffs/ILMH16XB.FNT",""); // 8x16Dot Mincyo
+    InitFontx(fx24M,"/spiffs/ILMH24XB.FNT",""); // 12x24Dot Mincyo
+    InitFontx(fx32M,"/spiffs/ILMH32XB.FNT",""); // 16x32Dot Mincyo
+    
+    // Change SPI Clock Frequency
+    //spi_clock_speed(40000000); // 40MHz
+    //spi_clock_speed(60000000); // 60MHz
+
+    spi_master_init(&dev, CUSTOM_MOSI_GPIO, CUSTOM_SCLK_GPIO, CUSTOM_CS_GPIO, CUSTOM_DC_GPIO, CUSTOM_RESET_GPIO, CUSTOM_BL_GPIO);
+    lcdInit(&dev, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY);
+
+    lcdFillScreen(&dev, BLACK);
 }
