@@ -17,9 +17,9 @@ dependencies:
   wasm-micro-runtime:
     component_hash: null
     source:
-      path: C:\Users\li\git\wasm-micro-runtime
+      path: C:\Users\li\git\play-esp32\wasm4-esp32\vendor\wasm-micro-runtime
       type: local
     version: 2.0.0
-manifest_hash: cb93f75c9d3e9a3bbbdfad04315f2990de283ca36e903d760813461eb215dd69
+manifest_hash: d01327c766f69f9372a0f019146cebacfd8c51af6c4189e56ff68638d575e410
 target: esp32c6
 version: 1.0.0
