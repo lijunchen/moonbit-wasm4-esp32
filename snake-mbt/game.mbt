@@ -31,10 +31,7 @@ pub fn Game::new() -> Game {
     snake: Snake::new(),
     frame_count: 0,
     prev_gamepad: @wasm4.GamePad::default(),
-    fruit: Point::{
-      x: random.int(~limit=20),
-      y: random.int(~limit=20),
-    },
+    fruit: Point::{ x: random.int(limit=20), y: random.int(limit=20) },
   }
 }
 
@@ -50,17 +47,14 @@ pub fn update(self : Game) -> Unit {
       @wasm4.ToneFlag::new(),
     )
   }
-  if self.frame_count % 30 == 0 {
+  if self.frame_count % 15 == 0 {
     let dropped_pos = self.snake.update()
     if self.snake.body.front() == Some(self.fruit) {
       match dropped_pos {
         Some(pos) => self.snake.body.push_back(pos)
         None => ()
       }
-      self.fruit = Point::{
-        x: random.int(limit=20),
-        y: random.int(limit=20),
-      }
+      self.fruit = Point::{ x: random.int(limit=20), y: random.int(limit=20) }
     }
   }
   self.snake.draw()

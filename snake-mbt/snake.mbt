@@ -77,7 +77,10 @@ pub fn right(self : Snake) -> Unit {
 }
 
 pub fn is_dead(self : Snake) -> Bool {
-  self.body.iter().drop(1).find_first(
-    fn { point => point == self.body.front().unwrap() },
-  ).is_empty().not()
+  self.body
+  .iter()
+  .drop(1)
+  .find_first(fn { point => point == self.body.front().unwrap() })
+  .is_empty()
+  .not()
 }
