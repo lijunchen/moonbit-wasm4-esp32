@@ -134,11 +134,17 @@ int first = 1;
 
 void load_tinypong() {
   char error_buf[128];
-  printf("[LOAD TINYPING]: card_data: %p\n", card_data);
-  wasm_module = first ? wasm_runtime_load(__game_card, __game_card_len,
-                                          error_buf, sizeof(error_buf))
-                      : wasm_runtime_load(card_data, card_length, error_buf,
-                                          sizeof(error_buf));
+
+  char* card = first ? __game_card : card_data;
+  int card_size = first ? __game_card_len : card_length;
+  int checksum = 0;
+  for (int i = 0; i < card_size; i++) {
+    checksum += card[i];
+  }
+  printf("[LOAD TINYPING]: card_data: %p, checksum: %d\n", card_data, checksum);
+  wasm_module =
+      wasm_runtime_load(card, card_size, error_buf, sizeof(error_buf));
+
   if (first) {
     first = 0;
   }
@@ -201,7 +207,8 @@ void init_wamr() {
   while (true) {
     if (stop == 1) {
       printf("[WAMR] wait restart signal\n");
-      vTaskDelay(100 / portTICK_PERIOD_MS);
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
+      continue;
     }
     load_tinypong();
     run_wasm4(NULL);

@@ -130,7 +130,7 @@ int card_length = 0;
 extern uint32_t stop;
 
 void uart_rx_task(void* pvParameter) {
-  uint8_t buf[16];
+  uint8_t buf[128];
   while (1) {
     uint32_t current = 0;
     uint32_t total_size = 0;
@@ -152,45 +152,47 @@ void uart_rx_task(void* pvParameter) {
     printf("frame type: %ld\n", type);
     current += n;
 
-    while (current < total_size) {
-      int len =
-          uart_read_bytes(UART_NUM_0, buf, sizeof(buf), pdMS_TO_TICKS(1000));
-      if (len > 0) {
-        memcpy(card_data + current - 8, buf, len);
-        current += len;
-      }
-    }
-    card_length = total_size - 8;
-    int checksum = 0;
-    for (int i = 0; i < card_length; i++) {
-      checksum += card_data[i];
-    }
-
-    printf("card length: %d, checksum: %d\n", card_length, checksum);
-    for (int i = 0; i < card_length && i < 32; i++) {
-      char c = card_data[i];
-      if (isprint(c)) {
-        printf("%c", c);
-      } else {
-        if (c == '\n') {
-          printf("\n");
-        } else if (c == '\r') {
-          printf("\n");
-        } else {
-          printf(".");
+    if (type == 1234) {
+      stop = 1;
+      while (current < total_size) {
+        int len =
+            uart_read_bytes(UART_NUM_0, buf, sizeof(buf), pdMS_TO_TICKS(1000));
+        if (len > 0) {
+          memcpy(card_data + current - 8, buf, len);
+          current += len;
         }
       }
-    }
+      card_length = total_size - 8;
+      card_data[card_length] = '\0';
+      int checksum = 0;
+      for (int i = 0; i < card_length; i++) {
+        checksum += card_data[i];
+      }
 
-    if (type == 1) {
-      stop = 1;
+      printf("card length: %d, checksum: %d\n", card_length, checksum);
+      for (int i = 0; i < card_length && i < 32; i++) {
+        char c = card_data[i];
+        if (isprint(c)) {
+          printf("%c", c);
+        } else {
+          if (c == '\n') {
+            printf("\n");
+          } else if (c == '\r') {
+            printf("\n");
+          } else {
+            printf(".");
+          }
+        }
+      }
+
       vTaskDelay(100 / portTICK_PERIOD_MS);
       fillTest();
       vTaskDelay(100 / portTICK_PERIOD_MS);
       stop = 0;
+
+      printf("\n");
     }
 
-    printf("\n");
     vTaskDelay(10 / portTICK_PERIOD_MS);
   }
 }
