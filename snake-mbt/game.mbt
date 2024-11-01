@@ -47,7 +47,7 @@ pub fn update(self : Game) -> Unit {
       @wasm4.ToneFlag::new(),
     )
   }
-  if self.frame_count % 15 == 0 {
+  if self.frame_count % 60 == 0 {
     let dropped_pos = self.snake.update()
     if self.snake.body.front() == Some(self.fruit) {
       match dropped_pos {

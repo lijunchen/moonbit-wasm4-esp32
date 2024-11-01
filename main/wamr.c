@@ -114,6 +114,10 @@ static NativeSymbol native_symbols[] = {
     {"tracef", wrap_w4_runtimeTracef, "(ii)"},
 };
 
+extern uint32_t stop;
+extern char card_data[];
+extern int card_length;
+
 extern unsigned char __game_card[];
 extern unsigned int __game_card_len;
 
@@ -126,10 +130,18 @@ wasm_exec_env_t exec_env2 = NULL;
 
 extern void run_wasm4(void* pvParameters);
 
+int first = 1;
+
 void load_tinypong() {
   char error_buf[128];
-  wasm_module = wasm_runtime_load(__game_card, __game_card_len, error_buf,
-                                  sizeof(error_buf));
+  printf("[LOAD TINYPING]: card_data: %p\n", card_data);
+  wasm_module = first ? wasm_runtime_load(__game_card, __game_card_len,
+                                          error_buf, sizeof(error_buf))
+                      : wasm_runtime_load(card_data, card_length, error_buf,
+                                          sizeof(error_buf));
+  if (first) {
+    first = 0;
+  }
   if (!wasm_module) {
     printf("Failed to load wasm module: %s\n", error_buf);
     return;
@@ -186,9 +198,14 @@ void init_wamr() {
   printf("memory test done\n");
   heap_caps_print_heap_info(MALLOC_CAP_8BIT);
 
-  load_tinypong();
-
-  run_wasm4(NULL);
+  while (true) {
+    if (stop == 1) {
+      printf("[WAMR] wait restart signal\n");
+      vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+    load_tinypong();
+    run_wasm4(NULL);
+  }
 
   /* Clean up */
   // wasm_runtime_deinstantiate(wasm_module_inst);

@@ -156,11 +156,17 @@ void uart_rx_task(void* pvParameter) {
       int len =
           uart_read_bytes(UART_NUM_0, buf, sizeof(buf), pdMS_TO_TICKS(1000));
       if (len > 0) {
-        memcpy(card_data + current, buf, len);
+        memcpy(card_data + current - 8, buf, len);
         current += len;
       }
     }
-    card_length = current;
+    card_length = total_size - 8;
+    int checksum = 0;
+    for (int i = 0; i < card_length; i++) {
+      checksum += card_data[i];
+    }
+
+    printf("card length: %d, checksum: %d\n", card_length, checksum);
     for (int i = 0; i < card_length && i < 32; i++) {
       char c = card_data[i];
       if (isprint(c)) {
@@ -180,6 +186,8 @@ void uart_rx_task(void* pvParameter) {
       stop = 1;
       vTaskDelay(100 / portTICK_PERIOD_MS);
       fillTest();
+      vTaskDelay(100 / portTICK_PERIOD_MS);
+      stop = 0;
     }
 
     printf("\n");
@@ -208,6 +216,16 @@ void app_main(void) {
   vTaskDelay(100 / portTICK_PERIOD_MS);
   ST7789(NULL);
   fillTest();
+
+  // memory check
+  for (int i = 0; i < 64 * 1024; i++) {
+    card_data[i] = 1;
+  }
+  int checksum = 0;
+  for (int i = 0; i < 64 * 1024; i++) {
+    checksum += card_data[i];
+  }
+  printf("card_data %p, memory check: %d\n", card_data, checksum);
 
   xTaskCreate(uart_rx_task, "uart_rx_task", 1024 * 4, NULL, 10, NULL);
 
