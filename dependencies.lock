@@ -1,0 +1,49 @@
+dependencies:
+  espressif/button:
+    component_hash: 5357a6a2c0c47fa67eb9a4dad8cbd78f848d05409b3557e49ec9948898655cfb
+    dependencies:
+    - name: espressif/cmake_utilities
+      registry_url: https://components.espressif.com
+      require: private
+      version: 0.*
+    - name: idf
+      require: private
+      version: '>=4.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 3.4.0
+  espressif/cmake_utilities:
+    component_hash: 351350613ceafba240b761b4ea991e0f231ac7a9f59a9ee901f751bddc0bb18f
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.1'
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    version: 0.5.3
+  idf:
+    source:
+      type: idf
+    version: 5.3.1
+  wasm-micro-runtime:
+    dependencies:
+    - name: idf
+      version: '>=4.4'
+    source:
+      path: /Users/li/git/moonbit-wasm4-esp32/vendor/wasm-micro-runtime
+      type: local
+    targets:
+    - esp32
+    - esp32s3
+    - esp32c3
+    - esp32c6
+    version: 2.0.0
+direct_dependencies:
+- espressif/button
+- idf
+- wasm-micro-runtime
+manifest_hash: 0268304a325b159e9ad75c52c9f688201e4ca8f5be00158f6c098d1068311f9b
+target: esp32c6
+version: 2.0.0

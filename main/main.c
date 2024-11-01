@@ -20,33 +20,51 @@
 #include "wamr.h"
 #include "control.h"
 
+#include <esp_task_wdt.h>
 
 #define INTERVAL 400
 #define WAIT vTaskDelay(INTERVAL)
 
 #define IWASM_MAIN_STACK_SIZE 5120
 
-#define FATAL(msg, ...) { printf("Fatal: " msg "\n", ##__VA_ARGS__); return; }
-
+#define FATAL(msg, ...)                            \
+    {                                              \
+        printf("Fatal: " msg "\n", ##__VA_ARGS__); \
+        return;                                    \
+    }
 
 extern unsigned char __game_card[];
 extern unsigned int __game_card_len;
 
-void w4_windowBoot ();
+void w4_windowBoot();
 
-uint16_t last[160*160];
+uint16_t last[160 * 160];
 
-extern void* wamr_get_phy_memory();
+extern void *wamr_get_phy_memory();
 
-void run_wasm4(void *pvParameters) {
+void run_wasm4(void *pvParameters)
+{
     w4_Disk disk = {0};
-    uint8_t* memory = wamr_get_phy_memory();
+    uint8_t *memory = wamr_get_phy_memory();
     w4_runtimeInit(memory, &disk);
     // w4_wasmLoadModule(__tinypong_wasm, len);
     w4_windowBoot();
 }
 
-void app_main(void)
+void feed_watchdog(void *pvParameter)
+{
+
+    esp_task_wdt_add(NULL);
+
+    for (;;)
+    {
+        printf("Feed 🐶\n");
+        esp_task_wdt_reset();
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
+void print_chip_info()
 {
     /* Print chip information */
     esp_chip_info_t chip_info;
@@ -63,7 +81,8 @@ void app_main(void)
     unsigned major_rev = chip_info.revision / 100;
     unsigned minor_rev = chip_info.revision % 100;
     printf("silicon revision v%d.%d, ", major_rev, minor_rev);
-    if(esp_flash_get_size(NULL, &flash_size) != ESP_OK) {
+    if (esp_flash_get_size(NULL, &flash_size) != ESP_OK)
+    {
         printf("Get flash size failed");
         return;
     }
@@ -71,6 +90,12 @@ void app_main(void)
     printf("%" PRIu32 "MB %s flash\n", flash_size / (uint32_t)(1024 * 1024),
            (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
     printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
+}
+
+void app_main(void)
+{
+    xTaskCreate(feed_watchdog, "feed_watchdog", 2048, NULL, 1, NULL);
+
     init_button();
     nvs_flash_init();
     ST7789(NULL);
@@ -85,8 +110,9 @@ void app_main(void)
     assert(res == 0);
     res = pthread_join(t, NULL);
     assert(res == 0);
-    xTaskCreate(run_wasm4, "wasm4", 1024*6, NULL, 2, NULL);
-    while (1) {
+    xTaskCreate(run_wasm4, "wasm4", 1024 * 6, NULL, 2, NULL);
+    while (1)
+    {
         printf("Main loop is running\n");
         vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
