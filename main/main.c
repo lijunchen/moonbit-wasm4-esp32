@@ -20,6 +20,8 @@
 #include <esp_system.h>
 #include <nvs_flash.h>
 
+#include <driver/gpio.h>
+#include <driver/uart.h>
 #include <esp_task_wdt.h>
 
 #define INTERVAL 400
@@ -90,13 +92,114 @@ void print_chip_info() {
          esp_get_minimum_free_heap_size());
 }
 
+void init_watch_dog() {
+  const esp_task_wdt_config_t cfg = {
+      .timeout_ms = 30000,
+      .idle_core_mask = 0,
+      .trigger_panic = false,
+  };
+  esp_task_wdt_init(&cfg);
+}
+
+void fillTest() {
+  printf("Fill Black\n");
+  lcdFillScreen(&dev, BLACK);
+  vTaskDelay(pdMS_TO_TICKS(200));
+  lcdFillScreen(&dev, RED);
+  printf("Fill Red\n");
+  vTaskDelay(pdMS_TO_TICKS(200));
+  lcdFillScreen(&dev, BLUE);
+  printf("Fill Blue\n");
+  vTaskDelay(pdMS_TO_TICKS(200));
+  lcdFillScreen(&dev, GREEN);
+  printf("Fill Green\n");
+  vTaskDelay(pdMS_TO_TICKS(200));
+  lcdFillScreen(&dev, CYAN);
+  printf("Fill Cyan\n");
+  vTaskDelay(pdMS_TO_TICKS(200));
+  lcdFillScreen(&dev, PURPLE);
+  printf("Fill Purple\n");
+  vTaskDelay(pdMS_TO_TICKS(200));
+}
+
+#define BUF_SIZE (1024)
+
+char card_data[64 * 1024];
+int card_length = 0;
+
+extern uint32_t stop;
+
+void uart_rx_task(void* pvParameter) {
+  uint8_t buf[16];
+  while (1) {
+    uint32_t size = 0;
+    int length = uart_read_bytes(UART_NUM_0, (uint8_t*)&size, sizeof(size),
+                                 pdMS_TO_TICKS(1000));
+    if (length <= 0) {
+      vTaskDelay(10 / portTICK_PERIOD_MS);
+      continue;
+    }
+    printf("expected size: %ld\n", size);
+    uint32_t current = 0;
+    while (current < size) {
+      int len =
+          uart_read_bytes(UART_NUM_0, buf, sizeof(buf), pdMS_TO_TICKS(1000));
+      if (len > 0) {
+        memcpy(card_data + current, buf, len);
+        current += len;
+      }
+    }
+    card_length = current;
+    for (int i = 0; i < card_length; i++) {
+      char c = card_data[i];
+      if (isprint(c)) {
+        printf("%c", c);
+      } else {
+        if (c == '\n') {
+          printf("\n");
+        } else if (c == '\r') {
+          printf("\n");
+        } else {
+          printf(".");
+        }
+      }
+    }
+
+    if (card_data[0] == 'S' && card_data[1] == 'T' && card_data[2] == '7') {
+      stop = 1;
+      vTaskDelay(100 / portTICK_PERIOD_MS);
+      fillTest();
+    }
+
+    printf("\n");
+    vTaskDelay(10 / portTICK_PERIOD_MS);
+  }
+}
+
+void init_uart() {
+  uart_config_t uart_cfg = {.baud_rate = 115200,
+                            .data_bits = UART_DATA_8_BITS,
+                            .parity = UART_PARITY_ODD,
+                            .stop_bits = UART_STOP_BITS_1,
+                            .flow_ctrl = UART_HW_FLOWCTRL_DISABLE};
+  uart_param_config(UART_NUM_0, &uart_cfg);
+  uart_driver_install(UART_NUM_0, BUF_SIZE * 2, 0, 0, NULL, 0);
+  printf("ESP32 ready to receive data over UART0...\n");
+}
+
 void app_main(void) {
-  xTaskCreate(feed_watchdog, "feed_watchdog", 2048, NULL, 1, NULL);
+  //   init_watch_dog();
+  //   xTaskCreate(feed_watchdog, "feed_watchdog", 2048, NULL, 6, NULL);
+  init_uart();
 
   init_button();
   nvs_flash_init();
+  vTaskDelay(100 / portTICK_PERIOD_MS);
   ST7789(NULL);
-  FillTest(&dev, CONFIG_WIDTH, CONFIG_HEIGHT);
+  fillTest();
+
+  xTaskCreate(uart_rx_task, "uart_rx_task", 1024 * 4, NULL, 10, NULL);
+
   pthread_t t;
   int res;
   pthread_attr_t tattr;
@@ -104,10 +207,7 @@ void app_main(void) {
   pthread_attr_setdetachstate(&tattr, PTHREAD_CREATE_JOINABLE);
   pthread_attr_setstacksize(&tattr, IWASM_MAIN_STACK_SIZE);
   res = pthread_create(&t, &tattr, init_wamr, (void*)NULL);
-  assert(res == 0);
-  res = pthread_join(t, NULL);
-  assert(res == 0);
-  xTaskCreate(run_wasm4, "wasm4", 1024 * 6, NULL, 2, NULL);
+
   while (1) {
     printf("Main loop is running\n");
     vTaskDelay(2000 / portTICK_PERIOD_MS);

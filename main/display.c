@@ -23,9 +23,15 @@ extern wasm_function_inst_t start;
 extern wasm_function_inst_t update;
 extern wasm_exec_env_t exec_env;
 
+uint32_t stop = 0;
+
 void w4_windowBoot() {
   int counter = 0;
   do {
+    if (stop) {
+      printf("[WAMS4] stopping\n");
+      break;
+    }
     if (!wasm_module_inst || !start || !update || !exec_env) {
       continue;
     }
@@ -145,8 +151,4 @@ void ST7789(void* pvParameters) {
   spi_master_init(&dev, CUSTOM_MOSI_GPIO, CUSTOM_SCLK_GPIO, CUSTOM_CS_GPIO,
                   CUSTOM_DC_GPIO, CUSTOM_RESET_GPIO, CUSTOM_BL_GPIO);
   lcdInit(&dev, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY);
-
-  vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-  lcdFillScreen(&dev, BLACK);
 }
