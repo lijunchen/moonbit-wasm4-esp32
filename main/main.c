@@ -132,16 +132,27 @@ extern uint32_t stop;
 void uart_rx_task(void* pvParameter) {
   uint8_t buf[16];
   while (1) {
-    uint32_t size = 0;
-    int length = uart_read_bytes(UART_NUM_0, (uint8_t*)&size, sizeof(size),
-                                 pdMS_TO_TICKS(1000));
-    if (length <= 0) {
+    uint32_t current = 0;
+    uint32_t total_size = 0;
+    int n = uart_read_bytes(UART_NUM_0, (uint8_t*)&total_size,
+                            sizeof(total_size), pdMS_TO_TICKS(1000));
+    if (n <= 0) {
       vTaskDelay(10 / portTICK_PERIOD_MS);
       continue;
     }
-    printf("expected size: %ld\n", size);
-    uint32_t current = 0;
-    while (current < size) {
+    printf("expected total_size: %ld\n", total_size);
+    current += n;
+    uint32_t type = 0;
+    n = uart_read_bytes(UART_NUM_0, (uint8_t*)&type, sizeof(type),
+                        pdMS_TO_TICKS(1000));
+    if (n <= 0) {
+      vTaskDelay(10 / portTICK_PERIOD_MS);
+      continue;
+    }
+    printf("frame type: %ld\n", type);
+    current += n;
+
+    while (current < total_size) {
       int len =
           uart_read_bytes(UART_NUM_0, buf, sizeof(buf), pdMS_TO_TICKS(1000));
       if (len > 0) {
@@ -150,7 +161,7 @@ void uart_rx_task(void* pvParameter) {
       }
     }
     card_length = current;
-    for (int i = 0; i < card_length; i++) {
+    for (int i = 0; i < card_length && i < 32; i++) {
       char c = card_data[i];
       if (isprint(c)) {
         printf("%c", c);
@@ -165,7 +176,7 @@ void uart_rx_task(void* pvParameter) {
       }
     }
 
-    if (card_data[0] == 'S' && card_data[1] == 'T' && card_data[2] == '7') {
+    if (type == 1) {
       stop = 1;
       vTaskDelay(100 / portTICK_PERIOD_MS);
       fillTest();
