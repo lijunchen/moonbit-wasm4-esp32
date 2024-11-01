@@ -10,3 +10,8 @@ moon build -C ./snake-mbt --target wasm
 xxd -n __game_card -i ./snake-mbt/target/wasm/release/build/snake.wasm > ./main/gamecard.c
 idf.py flash
 ```
+
+```
+moon build -C ./fast-snake --target wasm
+xxd -n __game_card -i ./fast-snake/target/wasm/release/build/snake.wasm > ./main/gamecard.c
+```
