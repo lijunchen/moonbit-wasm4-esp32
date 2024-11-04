@@ -186,8 +186,7 @@ void uart_rx_task(void* pvParameter) {
       }
 
       vTaskDelay(100 / portTICK_PERIOD_MS);
-      fillTest();
-      vTaskDelay(100 / portTICK_PERIOD_MS);
+      //   fillTest();
       stop = 0;
 
       printf("\n");
