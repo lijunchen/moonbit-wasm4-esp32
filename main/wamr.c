@@ -142,6 +142,10 @@ void load_tinypong() {
     checksum += card[i];
   }
   printf("[LOAD TINYPING]: card_data: %p, checksum: %d\n", card_data, checksum);
+  if (wasm_module != NULL) {
+    wasm_runtime_unload(wasm_module);
+    wasm_module = NULL;
+  }
   wasm_module =
       wasm_runtime_load(card, card_size, error_buf, sizeof(error_buf));
 
@@ -154,6 +158,10 @@ void load_tinypong() {
   }
 
   printf("Instantiate the wasm module\n");
+  if (wasm_module_inst != NULL) {
+    wasm_runtime_deinstantiate(wasm_module_inst);
+    wasm_module_inst = NULL;
+  }
   wasm_module_inst = wasm_runtime_instantiate(wasm_module, 16 * 1024, 64 * 1024,
                                               error_buf, sizeof(error_buf));
   if (!wasm_module_inst) {
@@ -168,7 +176,16 @@ void load_tinypong() {
   update = wasm_runtime_lookup_function(wasm_module_inst, "update");
   printf("update: %p\n", update);
 
+  if (exec_env != NULL) {
+    wasm_runtime_destroy_exec_env(exec_env);
+    exec_env = NULL;
+  }
   exec_env = wasm_runtime_create_exec_env(wasm_module_inst, 2 * 1024);
+
+  if (exec_env2 != NULL) {
+    wasm_runtime_destroy_exec_env(exec_env2);
+    exec_env2 = NULL;
+  }
 }
 
 void init_wamr() {
