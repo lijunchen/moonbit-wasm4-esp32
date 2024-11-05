@@ -136,10 +136,7 @@ void load_tinypong() {
   char error_buf[128];
 
   if (first) {
-    // copy game card to card_data use for loop
-    for (int i = 0; i < __game_card_len; i++) {
-      card_data[i] = __game_card[i];
-    }
+    memcpy(card_data, __game_card, __game_card_len);
     card_length = __game_card_len;
     first = 0;
   }
