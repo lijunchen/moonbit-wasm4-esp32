@@ -146,10 +146,7 @@ void load_tinypong() {
     checksum += card_data[i];
   }
   printf("[LOAD TINYPING]: card_data: %p, checksum: %d\n", card_data, checksum);
-  if (wasm_module != NULL) {
-    wasm_runtime_unload(wasm_module);
-    wasm_module = NULL;
-  }
+
   wasm_module =
       wasm_runtime_load(card_data, card_length, error_buf, sizeof(error_buf));
 
@@ -159,10 +156,7 @@ void load_tinypong() {
   }
 
   printf("Instantiate the wasm module\n");
-  if (wasm_module_inst != NULL) {
-    wasm_runtime_deinstantiate(wasm_module_inst);
-    wasm_module_inst = NULL;
-  }
+
   wasm_module_inst = wasm_runtime_instantiate(wasm_module, 16 * 1024, 64 * 1024,
                                               error_buf, sizeof(error_buf));
   if (!wasm_module_inst) {
@@ -177,16 +171,9 @@ void load_tinypong() {
   update = wasm_runtime_lookup_function(wasm_module_inst, "update");
   printf("update: %p\n", update);
 
-  if (exec_env != NULL) {
-    wasm_runtime_destroy_exec_env(exec_env);
-    exec_env = NULL;
-  }
   exec_env = wasm_runtime_create_exec_env(wasm_module_inst, 2 * 1024);
 
-  if (exec_env2 != NULL) {
-    wasm_runtime_destroy_exec_env(exec_env2);
-    exec_env2 = NULL;
-  }
+  exec_env2 = wasm_runtime_create_exec_env(wasm_module_inst, 10 * 1024);
 }
 
 void print_memory_info() { heap_caps_print_heap_info(MALLOC_CAP_8BIT); }
@@ -214,16 +201,11 @@ void init_wamr() {
   printf("os_malloc p0: %p\n", p0);
   char* p1 = (char*)os_malloc(1024);
   printf("os_malloc p1: %p\n", p1);
+  os_free(p0);
+  os_free(p1);
 
   printf("default game card address: %p\n", __game_card);
   printf("game card buffer address: %p\n", card_data);
-
-  printf("Initialize WASM runtime\n");
-  /* Initialize runtime environment */
-  if (!wasm_runtime_full_init(&init_args)) {
-    printf("Init runtime failed.\n");
-    return;
-  }
 
   while (true) {
     if (stop == 1) {
@@ -231,7 +213,34 @@ void init_wamr() {
       vTaskDelay(1000 / portTICK_PERIOD_MS);
       continue;
     }
+
+    if (exec_env != NULL) {
+      wasm_runtime_destroy_exec_env(exec_env);
+      exec_env = NULL;
+    }
+    if (exec_env2 != NULL) {
+      wasm_runtime_destroy_exec_env(exec_env2);
+      exec_env2 = NULL;
+    }
+    if (wasm_module_inst != NULL) {
+      wasm_runtime_deinstantiate(wasm_module_inst);
+      wasm_module_inst = NULL;
+    }
+    if (wasm_module != NULL) {
+      wasm_runtime_unload(wasm_module);
+      wasm_module = NULL;
+    }
+    if (wasm_runtime_init()) {
+      wasm_runtime_destroy();
+    }
+
     printf("In loop\n");
+    printf("Initialize WASM runtime\n");
+    /* Initialize runtime environment */
+    if (!wasm_runtime_full_init(&init_args)) {
+      printf("Init runtime failed.\n");
+      return;
+    }
     print_memory_info();
     load_tinypong();
     run_wasm4(NULL);
@@ -257,8 +266,5 @@ void w4_wasmCallStart() {
 
 void w4_wasmCallUpdate() {
   update = wasm_runtime_lookup_function(wasm_module_inst, "update");
-  if (!exec_env2) {
-    exec_env2 = wasm_runtime_create_exec_env(wasm_module_inst, 10 * 1024);
-  }
   wasm_runtime_call_wasm(exec_env2, update, 0, NULL);
 }
