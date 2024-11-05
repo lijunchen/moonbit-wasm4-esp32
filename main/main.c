@@ -35,7 +35,7 @@
     return;                                                                    \
   }
 
-extern unsigned char __game_card[];
+const extern unsigned char __game_card[];
 extern unsigned int __game_card_len;
 
 void w4_windowBoot();

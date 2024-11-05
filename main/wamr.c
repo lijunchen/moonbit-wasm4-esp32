@@ -118,7 +118,7 @@ extern uint32_t stop;
 extern char card_data[];
 extern int card_length;
 
-extern unsigned char __game_card[];
+const extern unsigned char __game_card[];
 extern unsigned int __game_card_len;
 
 wasm_module_t wasm_module = NULL;
@@ -135,11 +135,18 @@ int first = 1;
 void load_tinypong() {
   char error_buf[128];
 
-  char* card = first ? __game_card : card_data;
-  int card_size = first ? __game_card_len : card_length;
+  if (first) {
+    // copy game card to card_data use for loop
+    for (int i = 0; i < __game_card_len; i++) {
+      card_data[i] = __game_card[i];
+    }
+    card_length = __game_card_len;
+    first = 0;
+  }
+
   int checksum = 0;
-  for (int i = 0; i < card_size; i++) {
-    checksum += card[i];
+  for (int i = 0; i < card_length; i++) {
+    checksum += card_data[i];
   }
   printf("[LOAD TINYPING]: card_data: %p, checksum: %d\n", card_data, checksum);
   if (wasm_module != NULL) {
@@ -147,11 +154,8 @@ void load_tinypong() {
     wasm_module = NULL;
   }
   wasm_module =
-      wasm_runtime_load(card, card_size, error_buf, sizeof(error_buf));
+      wasm_runtime_load(card_data, card_length, error_buf, sizeof(error_buf));
 
-  if (first) {
-    first = 0;
-  }
   if (!wasm_module) {
     printf("Failed to load wasm module: %s\n", error_buf);
     return;
@@ -188,6 +192,8 @@ void load_tinypong() {
   }
 }
 
+void print_memory_info() { heap_caps_print_heap_info(MALLOC_CAP_8BIT); }
+
 void init_wamr() {
   /* Setup variables for instantiating and running the wasm module */
 
@@ -205,7 +211,15 @@ void init_wamr() {
   init_args.native_symbols = native_symbols;
   init_args.n_native_symbols = sizeof(native_symbols) / sizeof(NativeSymbol);
 
-  heap_caps_print_heap_info(MALLOC_CAP_8BIT);
+  print_memory_info();
+
+  char* p0 = (char*)os_malloc(1024);
+  printf("os_malloc p0: %p\n", p0);
+  char* p1 = (char*)os_malloc(1024);
+  printf("os_malloc p1: %p\n", p1);
+
+  printf("default game card address: %p\n", __game_card);
+  printf("game card buffer address: %p\n", card_data);
 
   printf("Initialize WASM runtime\n");
   /* Initialize runtime environment */
@@ -214,19 +228,14 @@ void init_wamr() {
     return;
   }
 
-  printf("Load the wasm module from memory\n");
-  printf("tinywasm: %p, len: %d\n", __game_card, __game_card_len);
-  int count = 0;
-  printf("count: %d\n", count);
-  printf("memory test done\n");
-  heap_caps_print_heap_info(MALLOC_CAP_8BIT);
-
   while (true) {
     if (stop == 1) {
       printf("[WAMR] wait restart signal\n");
       vTaskDelay(1000 / portTICK_PERIOD_MS);
       continue;
     }
+    printf("In loop\n");
+    print_memory_info();
     load_tinypong();
     run_wasm4(NULL);
   }
