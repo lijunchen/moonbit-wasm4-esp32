@@ -162,6 +162,7 @@ void load_tinypong() {
   if (!wasm_module_inst) {
     printf("Failed to instantiate wasm module: %s\n", error_buf);
     wasm_runtime_unload(wasm_module);
+    wasm_module = NULL;
     return;
   }
 
@@ -207,6 +208,8 @@ void init_wamr() {
   printf("default game card address: %p\n", __game_card);
   printf("game card buffer address: %p\n", card_data);
 
+  bool wamr_init = false;
+
   while (true) {
     if (stop == 1) {
       printf("[WAMR] wait restart signal\n");
@@ -214,24 +217,25 @@ void init_wamr() {
       continue;
     }
 
-    if (exec_env != NULL) {
+    if (exec_env) {
       wasm_runtime_destroy_exec_env(exec_env);
       exec_env = NULL;
     }
-    if (exec_env2 != NULL) {
+    if (exec_env2) {
       wasm_runtime_destroy_exec_env(exec_env2);
       exec_env2 = NULL;
     }
-    if (wasm_module_inst != NULL) {
+    if (wasm_module_inst) {
       wasm_runtime_deinstantiate(wasm_module_inst);
       wasm_module_inst = NULL;
     }
-    if (wasm_module != NULL) {
+    if (wasm_module) {
       wasm_runtime_unload(wasm_module);
       wasm_module = NULL;
     }
-    if (wasm_runtime_init()) {
+    if (wamr_init) {
       wasm_runtime_destroy();
+      wamr_init = false;
     }
 
     printf("In loop\n");
@@ -241,7 +245,10 @@ void init_wamr() {
       printf("Init runtime failed.\n");
       return;
     }
+    wamr_init = true;
+
     print_memory_info();
+
     load_tinypong();
     run_wasm4(NULL);
   }
@@ -264,7 +271,4 @@ void w4_wasmCallStart() {
   }
 }
 
-void w4_wasmCallUpdate() {
-  update = wasm_runtime_lookup_function(wasm_module_inst, "update");
-  wasm_runtime_call_wasm(exec_env2, update, 0, NULL);
-}
+void w4_wasmCallUpdate() { wasm_runtime_call_wasm(exec_env2, update, 0, NULL); }

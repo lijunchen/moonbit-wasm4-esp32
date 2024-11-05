@@ -32,6 +32,7 @@ void w4_windowBoot() {
       printf("[WAMS4] stopping\n");
       break;
     }
+    counter++;
     if (!wasm_module_inst || !start || !update || !exec_env) {
       continue;
     }
@@ -56,8 +57,6 @@ void w4_windowBoot() {
     w4_runtimeUpdate();
   } while (1);
 }
-
-int counter = 0;
 
 uint16_t convert(uint32_t c) {
   uint16_t color = rgb565((c & 0xff0000) >> 16, (c & 0xff00) >> 8, c & 0xff);
