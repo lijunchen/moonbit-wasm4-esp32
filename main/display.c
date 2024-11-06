@@ -11,6 +11,8 @@
 #include "st7789.h"
 #include "wasm_export.h"
 
+#include "esp_timer.h"
+
 // static uint32_t pixels[160*160];
 
 static int viewportX = 0;
@@ -27,13 +29,13 @@ uint32_t stop = 0;
 
 void w4_windowBoot() {
   int counter = 0;
-  TickType_t t0, t1;
+  int64_t t0, t1;
   do {
     if (stop) {
       printf("[WAMS4] stopping\n");
       break;
     }
-    t0 = xTaskGetTickCount();
+    t0 = esp_timer_get_time() / 1000;
     counter++;
     if (!wasm_module_inst || !start || !update || !exec_env) {
       continue;
@@ -55,7 +57,7 @@ void w4_windowBoot() {
     w4_runtimeSetMouse(160 * (mouseX - viewportX) / viewportSize,
                        160 * (mouseY - viewportY) / viewportSize, mouseButtons);
     w4_runtimeUpdate();
-    t1 = xTaskGetTickCount();
+    t1 = esp_timer_get_time() / 1000;
     printf("FPS: %f\n", 1000.0 / (t1 - t0));
   } while (1);
 }
@@ -84,8 +86,8 @@ uint8_t g(const uint8_t* framebuffer, int x, int y) {
 void w4_windowComposite(const uint32_t* palette, const uint8_t* framebuffer) {
   // Convert indexed 2bpp framebuffer to XRGB output
   // uint32_t* out = pixels;
-  TickType_t t0, t1;
-  t0 = xTaskGetTickCount();
+  int64_t t0, t1;
+  t0 = esp_timer_get_time() / 1000;
   for (int n = 0; n < 160 * 160 / 4; ++n) {
     uint8_t quartet = framebuffer[n];
     int color1 = (quartet & 0b00000011) >> 0;
@@ -106,11 +108,11 @@ void w4_windowComposite(const uint32_t* palette, const uint8_t* framebuffer) {
       lcdDrawPixel(&dev, x, y, c);
     }
   }
-  t1 = xTaskGetTickCount();
+  t1 = esp_timer_get_time() / 1000;
   printf("Prepare data %ld\n", t1 - t0);
-  t0 = xTaskGetTickCount();
+  t0 = esp_timer_get_time() / 1000;
   lcdDrawFinish(&dev);
-  t1 = xTaskGetTickCount();
+  t1 = esp_timer_get_time() / 1000;
   printf("Transmit data %ld\n", t1 - t0);
 }
 
