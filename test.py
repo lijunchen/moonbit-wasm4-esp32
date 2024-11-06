@@ -17,7 +17,7 @@ fast_snake = "./fast-snake/target/wasm/release/build/snake.wasm"
 slow_snake = "./snake-mbt/target/wasm/release/build/snake.wasm"
 tankle = "tankle-mbt/target/wasm/release/build/tankle.wasm"
 
-wasm_path = tankle
+wasm_path = fast_snake
 
 with open(wasm_path, "rb") as fp:
     payload = fp.read()

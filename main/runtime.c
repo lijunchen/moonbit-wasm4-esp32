@@ -9,6 +9,7 @@
 #include "wasm0.h"
 #include "window.h"
 
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 
 #define WIDTH 160
@@ -223,16 +224,17 @@ void w4_runtimeTracef(const uint8_t* str, const void* stack) {
 
 void w4_runtimeUpdate() {
   if (firstFrame) {
+
     firstFrame = false;
     w4_wasmCallStart();
   } else if (!(memory->systemFlags & SYSTEM_PRESERVE_FRAMEBUFFER)) {
     w4_framebufferClear();
   }
-  TickType_t t0, t1;
-  t0 = xTaskGetTickCount();
+  int64_t t0, t1;
+  t0 = esp_timer_get_time() / 1000;
   w4_wasmCallUpdate();
-  t1 = xTaskGetTickCount();
-  printf("Calculate frame %ld\n", t1 - t0);
+  t1 = esp_timer_get_time() / 1000;
+  printf("Update %lld\n", t1 - t0);
   w4_apuTick();
   uint32_t palette[4] = {
       w4_read32LE(&memory->palette[0]),

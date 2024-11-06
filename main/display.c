@@ -29,7 +29,8 @@ uint32_t stop = 0;
 
 void w4_windowBoot() {
   int counter = 0;
-  int64_t t0, t1;
+  int64_t t0 = 0;
+  int64_t t1 = 0;
   do {
     if (stop) {
       printf("[WAMS4] stopping\n");
@@ -58,7 +59,8 @@ void w4_windowBoot() {
                        160 * (mouseY - viewportY) / viewportSize, mouseButtons);
     w4_runtimeUpdate();
     t1 = esp_timer_get_time() / 1000;
-    printf("FPS: %f\n", 1000.0 / (t1 - t0));
+    printf("loop %lld\n", t1 - t0);
+    printf("FPS: %lf\n", 1.0 / (t1 - t0));
   } while (1);
 }
 
@@ -109,11 +111,11 @@ void w4_windowComposite(const uint32_t* palette, const uint8_t* framebuffer) {
     }
   }
   t1 = esp_timer_get_time() / 1000;
-  printf("Prepare data %ld\n", t1 - t0);
+  printf("Prepare data %lld\n", t1 - t0);
   t0 = esp_timer_get_time() / 1000;
   lcdDrawFinish(&dev);
   t1 = esp_timer_get_time() / 1000;
-  printf("Transmit data %ld\n", t1 - t0);
+  printf("Transmit data %lld\n", t1 - t0);
 }
 
 TickType_t FillTest(TFT_t* dev, int width, int height) {
