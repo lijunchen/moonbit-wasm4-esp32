@@ -217,6 +217,7 @@ void delayMS(int ms) {
 	vTaskDelay(xTicksToDelay);
 }
 
+extern uint16_t last[160 * 160];
 
 void lcdInit(TFT_t * dev, int width, int height, int offsetx, int offsety)
 {
@@ -268,7 +269,7 @@ void lcdInit(TFT_t * dev, int width, int height, int offsetx, int offsety)
 
 	dev->_use_frame_buffer = false;
 #if CONFIG_FRAME_BUFFER
-	dev->_frame_buffer = heap_caps_malloc(sizeof(uint16_t)*width*height, MALLOC_CAP_DMA);
+	dev->_frame_buffer = last;
 	if (dev->_frame_buffer == NULL) {
 		ESP_LOGE(TAG, "heap_caps_malloc fail");
 	} else {

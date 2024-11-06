@@ -132,6 +132,8 @@ extern void run_wasm4(void* pvParameters);
 
 int first = 1;
 
+void print_memory_info();
+
 void load_tinypong() {
   char error_buf[128];
 
@@ -155,9 +157,11 @@ void load_tinypong() {
     return;
   }
 
+  print_memory_info();
+
   printf("Instantiate the wasm module\n");
 
-  wasm_module_inst = wasm_runtime_instantiate(wasm_module, 16 * 1024, 64 * 1024,
+  wasm_module_inst = wasm_runtime_instantiate(wasm_module, 8 * 1024, 64 * 1024,
                                               error_buf, sizeof(error_buf));
   if (!wasm_module_inst) {
     printf("Failed to instantiate wasm module: %s\n", error_buf);

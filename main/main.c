@@ -102,29 +102,22 @@ void init_watch_dog() {
 }
 
 void fillTest() {
-  printf("Fill Black\n");
-  lcdFillScreen(&dev, BLACK);
-  vTaskDelay(pdMS_TO_TICKS(200));
-  lcdFillScreen(&dev, RED);
   printf("Fill Red\n");
-  vTaskDelay(pdMS_TO_TICKS(200));
-  lcdFillScreen(&dev, BLUE);
-  printf("Fill Blue\n");
-  vTaskDelay(pdMS_TO_TICKS(200));
-  lcdFillScreen(&dev, GREEN);
+  lcdFillScreen(&dev, RED);
+  vTaskDelay(pdMS_TO_TICKS(100));
+
   printf("Fill Green\n");
-  vTaskDelay(pdMS_TO_TICKS(200));
-  lcdFillScreen(&dev, CYAN);
-  printf("Fill Cyan\n");
-  vTaskDelay(pdMS_TO_TICKS(200));
-  lcdFillScreen(&dev, PURPLE);
-  printf("Fill Purple\n");
+  lcdFillScreen(&dev, GREEN);
+  vTaskDelay(pdMS_TO_TICKS(100));
+
+  printf("Fill Blue\n");
+  lcdFillScreen(&dev, BLUE);
   vTaskDelay(pdMS_TO_TICKS(200));
 }
 
 #define BUF_SIZE (1024)
 
-char card_data[64 * 1024];
+char card_data[48 * 1024];
 int card_length = 0;
 
 extern uint32_t stop;

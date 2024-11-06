@@ -20,10 +20,8 @@ fn render_welcome(_entities : Entities) -> Unit {
   @wasm4.set_draw_colors(2, index=1)
   @wasm4.set_draw_colors(2, index=2)
   @wasm4.rect(0, 0, 160, 160)
-
   @wasm4.set_draw_colors(3)
   @wasm4.text("TANKLE", 30, 10)
-
   @wasm4.text("Press x to Start", 20, 40)
 }
 

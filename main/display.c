@@ -82,21 +82,34 @@ uint8_t g(const uint8_t* framebuffer, int x, int y) {
 void w4_windowComposite(const uint32_t* palette, const uint8_t* framebuffer) {
   // Convert indexed 2bpp framebuffer to XRGB output
   // uint32_t* out = pixels;
-  for (int y = 0; y < 160; y++) {
-    uint8_t last_color = g(framebuffer, 0, y);
-    uint8_t last_x = 0;
-    for (int x = 1; x < 160; x++) {
-      uint8_t cur_color = g(framebuffer, x, y);
-      if (cur_color != last_color) {
-        lcdDrawFillRect(&dev, last_x + 40, y + 40, x + 40, y + 40,
-                        convert(palette[last_color]));
-        last_x = x;
-        last_color = cur_color;
-      }
+  TickType_t t0, t1;
+  t0 = xTaskGetTickCount();
+  for (int n = 0; n < 160 * 160 / 4; ++n) {
+    uint8_t quartet = framebuffer[n];
+    int color1 = (quartet & 0b00000011) >> 0;
+    int color2 = (quartet & 0b00001100) >> 2;
+    int color3 = (quartet & 0b00110000) >> 4;
+    int color4 = (quartet & 0b11000000) >> 6;
+
+    uint16_t c1 = convert(palette[color1]);
+    uint16_t c2 = convert(palette[color2]);
+    uint16_t c3 = convert(palette[color3]);
+    uint16_t c4 = convert(palette[color4]);
+    uint16_t cs[4] = {c1, c2, c3, c4};
+
+    for (int i = n * 4; i < n * 4 + 4; i++) {
+      int x = i % 160;
+      int y = i / 160;
+      uint16_t c = cs[i - n * 4];
+      lcdDrawPixel(&dev, x, y, c);
     }
-    lcdDrawFillRect(&dev, last_x + 40, y + 40, 160 + 40, y + 40,
-                    convert(palette[last_color]));
   }
+  t1 = xTaskGetTickCount();
+  //   printf("Prepare data %ld\n", t1 - t0);
+  t0 = xTaskGetTickCount();
+  lcdDrawFinish(&dev);
+  t1 = xTaskGetTickCount();
+  //   printf("Transmit data %ld\n", t1 - t0);
 }
 
 TickType_t FillTest(TFT_t* dev, int width, int height) {
@@ -154,6 +167,7 @@ void ST7789(void* pvParameters) {
   // Change SPI Clock Frequency
   // spi_clock_speed(40000000); // 40MHz
   // spi_clock_speed(60000000); // 60MHz
+  // spi_clock_speed(80000000); // 80MHz
 
   spi_master_init(&dev, CUSTOM_MOSI_GPIO, CUSTOM_SCLK_GPIO, CUSTOM_CS_GPIO,
                   CUSTOM_DC_GPIO, CUSTOM_RESET_GPIO, CUSTOM_BL_GPIO);

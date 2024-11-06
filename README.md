@@ -15,3 +15,5 @@ idf.py flash
 moon build -C ./fast-snake --target wasm
 xxd -n __game_card -i ./fast-snake/target/wasm/release/build/snake.wasm > ./main/gamecard.c
 ```
+
+xxd -n __game_card -i ./tankle.wasm > ./main/gamecard.c

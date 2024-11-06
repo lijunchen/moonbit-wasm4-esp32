@@ -1,11 +1,6 @@
 import serial
 import ctypes
 
-#   uart_config_t uart_cfg = {.baud_rate = 115200,
-#                             .data_bits = UART_DATA_8_BITS,
-#                             .parity = UART_PARITY_ODD,
-#                             .stop_bits = UART_STOP_BITS_1,
-#                             .flow_ctrl = UART_HW_FLOWCTRL_DISABLE};
 ser = serial.Serial(
     port="/dev/cu.wchusbserial58A60725371",
     baudrate=115200,
@@ -18,18 +13,13 @@ ser = serial.Serial(
 if ser.is_open:
     print("Serial port is open.")
 
-# struct Frame {
-#     length: u32,
-#     type: u32,
-#     data: [u8; length],
-# }
+fast_snake = "./fast-snake/target/wasm/release/build/snake.wasm"
+slow_snake = "./snake-mbt/target/wasm/release/build/snake.wasm"
+tankle = "tankle-mbt/target/wasm/release/build/tankle.wasm"
 
-fast_snake = "fast-snake"
-slow_snake = "snake-mbt"
+wasm_path = tankle
 
-snake = fast_snake
-
-with open(f"./{snake}/target/wasm/release/build/snake.wasm", "rb") as fp:
+with open(wasm_path, "rb") as fp:
     payload = fp.read()
 
 

@@ -26,7 +26,7 @@ typedef struct {
   uint8_t systemFlags;
   uint8_t _reserved[128];
   uint8_t framebuffer[WIDTH * HEIGHT >> 2];
-  uint8_t _user[58976];
+  uint8_t _user[10 * 1024];
 } Memory;
 #pragma pack()
 
