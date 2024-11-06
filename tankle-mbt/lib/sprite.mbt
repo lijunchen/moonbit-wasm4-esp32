@@ -1,0 +1,155 @@
+struct Sprite {
+  data : Bytes
+  width : Int
+  height : Int
+}
+
+let bullet_width = 4
+
+let bullet_sprite : Sprite = {
+  data: b"\x28\xaa\xaa\x00",
+  width: bullet_width,
+  height: bullet_width,
+}
+
+let tank_width = 12
+
+let player_sprite : Sprite = {
+  // data: [
+  //   b'\x00', b'\x10', b'\x00', b'\x00', b'\x10', b'\x00', b'\x00', b'\x10', b'\x00',
+  //   b'\xf0', b'\x98', b'\x3c', b'\xaa', b'\x9a', b'\xa8', b'\xfa', b'\x9a', b'\xbc',
+  //   b'\xaa', b'\x56', b'\xa8', b'\xfa', b'\x66', b'\xbc', b'\xaa', b'\x56', b'\xa8',
+  //   b'\xfa', b'\xaa', b'\xbc', b'\xaa', b'\xaa', b'\xa8', b'\xf8', b'\x00', b'\xbc',
+  // ]
+  // |> @bytes.of,
+  data: b"\x00\x10\x00\x00\x10\x00\x00\x10\x00\xf0\x98\x3c\xaa\x9a\xa8\xfa\x9a\xbc\xaa\x56\xa8\xfa\x66\xbc\xaa\x56\xa8\xfa\xaa\xbc\xaa\xaa\xa8\xf8\x00\xbc",
+  width: tank_width,
+  height: tank_width,
+}
+
+let greenQ_sprite : Sprite = {
+  // data: [
+  //   b'\x00', b'\x10', b'\x00', b'\xe0', b'\x10', b'\x2c', b'\xa0', b'\x10', b'\x28',
+  //   b'\xea', b'\x56', b'\xac', b'\xaa', b'\x9a', b'\xa8', b'\xea', b'\x56', b'\xac',
+  //   b'\xa9', b'\x99', b'\xa8', b'\xe9', b'\x99', b'\xac', b'\xa9', b'\xa9', b'\xa8',
+  //   b'\xea', b'\x56', b'\xac', b'\xaa', b'\xaa', b'\xa8', b'\xe0', b'\x00', b'\x2c',
+  // ]
+  // |> @bytes.of,
+  data: b"\x00\x10\x00\xe0\x10\x2c\xa0\x10\x28\xea\x56\xac\xaa\x9a\xa8\xea\x56\xac\xa9\x99\xa8\xe9\x99\xac\xa9\xa9\xa8\xea\x56\xac\xaa\xaa\xa8\xe0\x00\x2c",
+  width: tank_width,
+  height: tank_width,
+}
+
+let rhino_sprite : Sprite = {
+  // data: [
+  //   b'\x00', b'\x55', b'\x00', b'\xf8', b'\x14', b'\x2f', b'\xaa', b'\x14', b'\xaa',
+  //   b'\xfa', b'\x96', b'\xaf', b'\xaa', b'\x96', b'\xaa', b'\xfa', b'\x96', b'\xaf',
+  //   b'\xa9', b'\x55', b'\x6a', b'\xf9', b'\x9a', b'\x6f', b'\xa9', b'\xa6', b'\x6a',
+  //   b'\xf9', b'\x55', b'\x6f', b'\xaa', b'\xaa', b'\xaa', b'\xf8', b'\x00', b'\x2f',
+  // ]
+  // |> @bytes.of,
+  data: b"\x00\x55\x00\xf8\x14\x2f\xaa\x14\xaa\xfa\x96\xaf\xaa\x96\xaa\xfa\x96\xaf\xa9\x55\x6a\xf9\x9a\x6f\xa9\xa6\x6a\xf9\x55\x6f\xaa\xaa\xaa\xf8\x00\x2f",
+  width: tank_width,
+  height: tank_width,
+}
+
+let wolf_sprite : Sprite = {
+  // data: [
+  //   b'\x00', b'\x14', b'\x00', b'\x3c', b'\x14', b'\x3c', b'\x3a', b'\x14', b'\xac',
+  //   b'\x3a', b'\x96', b'\xac', b'\x3a', b'\x55', b'\xac', b'\x3a', b'\x55', b'\xac',
+  //   b'\x3a', b'\x69', b'\xac', b'\x3a', b'\x55', b'\xac', b'\x3a', b'\x69', b'\xac',
+  //   b'\x3a', b'\x55', b'\xac', b'\x3a', b'\xaa', b'\xac', b'\x3c', b'\x00', b'\x3c',
+  // ]
+  // |> @bytes.of,
+  data: b"\x00\x14\x00\x3c\x14\x3c\x3a\x14\xac\x3a\x96\xac\x3a\x55\xac\x3a\x55\xac\x3a\x69\xac\x3a\x55\xac\x3a\x69\xac\x3a\x55\xac\x3a\xaa\xac\x3c\x00\x3c",
+  width: tank_width,
+  height: tank_width,
+}
+
+let blackpig_sprite : Sprite = {
+  // data: [
+  //   b'\x00', b'\x55', b'\x00', b'\xfc', b'\x14', b'\x3f', b'\xaa', b'\x96', b'\xaa',
+  //   b'\xfe', b'\x55', b'\xbf', b'\x29', b'\x96', b'\x68', b'\xe6', b'\x55', b'\x9b',
+  //   b'\x26', b'\x69', b'\x98', b'\xe6', b'\x55', b'\x9b', b'\x29', b'\xaa', b'\x68',
+  //   b'\xfe', b'\x55', b'\xbf', b'\xaa', b'\xaa', b'\xaa', b'\xfc', b'\x00', b'\x3f',
+  // ]
+  // |> @bytes.of,
+  data: b"\x00\x55\x00\xfc\x14\x3f\xaa\x96\xaa\xfe\x55\xbf\x29\x96\x68\xe6\x55\x9b\x26\x69\x98\xe6\x55\x9b\x29\xaa\x68\xfe\x55\xbf\xaa\xaa\xaa\xfc\x00\x3f",
+  width: tank_width,
+  height: tank_width,
+}
+
+let armor_sprite : Sprite = {
+  // data: [
+  //   b'\x00', b'\x00', b'\x00', b'\x0f', b'\x03', b'\xc0', b'\x3a', b'\xce', b'\xb0',
+  //   b'\xea', b'\xba', b'\xac', b'\xea', b'\xaa', b'\xac', b'\xea', b'\xaa', b'\xac',
+  //   b'\x3a', b'\xaa', b'\xb0', b'\x0e', b'\xaa', b'\xc0', b'\x03', b'\xab', b'\x00',
+  //   b'\x00', b'\xec', b'\x00', b'\x00', b'\x30', b'\x00', b'\x00', b'\x00', b'\x00',
+  // ]
+  // |> @bytes.of,
+  data: b"\x00\x00\x00\x0f\x03\xc0\x3a\xce\xb0\xea\xba\xac\xea\xaa\xac\xea\xaa\xac\x3a\xaa\xb0\x0e\xaa\xc0\x03\xab\x00\x00\xec\x00\x00\x30\x00\x00\x00\x00",
+  width: tank_width,
+  height: tank_width,
+}
+
+let traj_sprite : Sprite = {
+  // data: [
+  //   b'\x00', b'\x00', b'\x00', b'\xff', b'\xff', b'\x00', b'\xe6', b'\xaa', b'\xc0',
+  //   b'\xe6', b'\xaa', b'\xb0', b'\xe6', b'\xaa', b'\x9c', b'\xe6', b'\xaa', b'\x93',
+  //   b'\xe6', b'\xaa', b'\x9c', b'\xe6', b'\xaa', b'\xb0', b'\xe6', b'\xaa', b'\xc0',
+  //   b'\xff', b'\xff', b'\x00', b'\x00', b'\x00', b'\x00', b'\x00', b'\x00', b'\x00',
+  // ]
+  // |> @bytes.of,
+  data: b"\x00\x00\x00\xff\xff\x00\xe6\xaa\xc0\xe6\xaa\xb0\xe6\xaa\x9c\xe6\xaa\x93\xe6\xaa\x9c\xe6\xaa\xb0\xe6\xaa\xc0\xff\xff\x00\x00\x00\x00\x00\x00\x00",
+  width: tank_width,
+  height: tank_width,
+}
+
+let cd_sprite : Sprite = {
+  // data: [
+  //   b'\x3f', b'\xff', b'\xf0', b'\x30', b'\x00', b'\x30', b'\x30', b'\x00', b'\x30',
+  //   b'\x0c', b'\x00', b'\xc0', b'\x03', b'\x57', b'\x00', b'\x00', b'\xdc', b'\x00',
+  //   b'\x00', b'\xdc', b'\x00', b'\x03', b'\x57', b'\x00', b'\x0d', b'\x55', b'\xc0',
+  //   b'\x35', b'\x55', b'\x70', b'\x35', b'\x55', b'\x70', b'\x3f', b'\xff', b'\xf0',
+  // ]
+  // |> @bytes.of,
+  data: b"\x3f\xff\xf0\x30\x00\x30\x30\x00\x30\x0c\x00\xc0\x03\x57\x00\x00\xdc\x00\x00\xdc\x00\x03\x57\x00\x0d\x55\xc0\x35\x55\x70\x35\x55\x70\x3f\xff\xf0",
+  width: tank_width,
+  height: tank_width,
+}
+
+let speed_sprite : Sprite = {
+  // data: [
+  //   b'\x00', b'\x00', b'\x00', b'\x00', b'\x00', b'\x00', b'\x0f', b'\xff', b'\xfc',
+  //   b'\x39', b'\xa6', b'\x9b', b'\x34', b'\x51', b'\x47', b'\x3f', b'\xff', b'\xfb',
+  //   b'\xe6', b'\x9a', b'\x6c', b'\xd1', b'\x45', b'\x1c', b'\xe6', b'\x9a', b'\x6c',
+  //   b'\x3f', b'\xff', b'\xf0', b'\x00', b'\x00', b'\x00', b'\x00', b'\x00', b'\x00',
+  // ]
+  // |> @bytes.of,
+  data: b"\x00\x00\x00\x00\x00\x00\x0f\xff\xfc\x39\xa6\x9b\x34\x51\x47\x3f\xff\xfb\xe6\x9a\x6c\xd1\x45\x1c\xe6\x9a\x6c\x3f\xff\xf0\x00\x00\x00\x00\x00\x00",
+  width: tank_width,
+  height: tank_width,
+}
+
+fn Sprite::blit(self : Sprite, x : Int, y : Int, dir : Direction) -> Unit {
+  let flip_y = dir == Down || dir == Right
+  let rotate = dir == Left || dir == Right
+  let blit_flag : @wasm4.BlitFlag = {
+    one_bit_per_pixel: false,
+    flip_x: false,
+    flip_y,
+    rotate,
+  }
+  @wasm4.set_draw_colors(index=1, 0)
+  @wasm4.set_draw_colors(index=2, 3)
+  @wasm4.set_draw_colors(index=3, 2)
+  @wasm4.set_draw_colors(index=4, 4)
+  @wasm4.blit(
+    @wasm4.sprite(self.data),
+    x,
+    y,
+    self.width,
+    self.height,
+    blit_flag,
+  )
+}

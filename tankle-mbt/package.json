@@ -1,0 +1,13 @@
+{
+  "name": "tankle-mbt",
+  "version": "1.0.0",
+  "description": "rougue-like tank game",
+  "scripts": {
+    "build": "moon build --target wasm",
+    "start": "w4 run target/wasm/release/build/tankle.wasm --no-open --no-qr",
+    "run": "moon build --target wasm && w4 run target/wasm/release/build/tankle.wasm --no-open --no-qr",
+    "bundle": "w4 bundle target/wasm/release/build/tankle.wasm --title Tankle --html tankle.html"
+  },
+  "author": "",
+  "license": "ISC"
+}

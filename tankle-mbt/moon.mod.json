@@ -1,0 +1,12 @@
+{
+  "name": "moonbit/tankle",
+  "version": "0.1.0",
+  "deps": {
+    "moonbitlang/wasm4": "0.2.2"
+  },
+  "readme": "README.md",
+  "repository": "",
+  "license": "",
+  "keywords": [],
+  "description": ""
+}
