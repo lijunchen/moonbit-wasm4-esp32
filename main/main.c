@@ -211,15 +211,15 @@ void app_main(void) {
   ST7789(NULL);
   fillTest();
 
-  // memory check
-  for (int i = 0; i < 64 * 1024; i++) {
-    card_data[i] = 1;
-  }
-  int checksum = 0;
-  for (int i = 0; i < 64 * 1024; i++) {
-    checksum += card_data[i];
-  }
-  printf("card_data %p, memory check: %d\n", card_data, checksum);
+  //   // memory check
+  //   for (int i = 0; i < 64 * 1024; i++) {
+  //     card_data[i] = 1;
+  //   }
+  //   int checksum = 0;
+  //   for (int i = 0; i < 64 * 1024; i++) {
+  //     checksum += card_data[i];
+  //   }
+  //   printf("card_data %p, memory check: %d\n", card_data, checksum);
 
   xTaskCreate(uart_rx_task, "uart_rx_task", 1024 * 4, NULL, 10, NULL);
 
