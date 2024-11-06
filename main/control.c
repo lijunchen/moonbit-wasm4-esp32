@@ -61,7 +61,7 @@ void init_button() {
     if (NULL == gpio_btn) {
       printf("Button create failed\n");
     }
-    iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_right,
+    iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_x,
                            (void*)BUTTON_SINGLE_CLICK);
   }
   {
@@ -100,5 +100,4 @@ void init_button() {
     iot_button_register_cb(gpio_btn, BUTTON_SINGLE_CLICK, button_down,
                            (void*)BUTTON_SINGLE_CLICK);
   }
-  printf("unused button_x: %p\n", button_x);
 }

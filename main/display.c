@@ -27,25 +27,25 @@ uint32_t stop = 0;
 
 void w4_windowBoot() {
   int counter = 0;
+  TickType_t t0, t1;
   do {
     if (stop) {
       printf("[WAMS4] stopping\n");
       break;
     }
+    t0 = xTaskGetTickCount();
     counter++;
     if (!wasm_module_inst || !start || !update || !exec_env) {
       continue;
     }
     // Player 1
     uint8_t gamepad = get_player_state(0);
-    // printf("player 1 state: %d\n", gamepad);
     w4_runtimeSetGamepad(0, gamepad);
 
     // Player 2
     gamepad = get_player_state(1);
     // printf("player 2 state: %d\n", gamepad);
     w4_runtimeSetGamepad(1, gamepad);
-
     clear_all_player_state();
 
     // Mouse handling
@@ -55,6 +55,8 @@ void w4_windowBoot() {
     w4_runtimeSetMouse(160 * (mouseX - viewportX) / viewportSize,
                        160 * (mouseY - viewportY) / viewportSize, mouseButtons);
     w4_runtimeUpdate();
+    t1 = xTaskGetTickCount();
+    printf("FPS: %f\n", 1000.0 / (t1 - t0));
   } while (1);
 }
 
@@ -105,11 +107,11 @@ void w4_windowComposite(const uint32_t* palette, const uint8_t* framebuffer) {
     }
   }
   t1 = xTaskGetTickCount();
-  //   printf("Prepare data %ld\n", t1 - t0);
+  printf("Prepare data %ld\n", t1 - t0);
   t0 = xTaskGetTickCount();
   lcdDrawFinish(&dev);
   t1 = xTaskGetTickCount();
-  //   printf("Transmit data %ld\n", t1 - t0);
+  printf("Transmit data %ld\n", t1 - t0);
 }
 
 TickType_t FillTest(TFT_t* dev, int width, int height) {

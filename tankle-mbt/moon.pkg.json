@@ -8,10 +8,7 @@
         "start",
         "update"
       ],
-      "import-memory": {
-        "module": "env",
-        "name": "memory"
-      },
+      "export-memory-name": "memory",
       "heap-start-address": 6560
     }
   }
