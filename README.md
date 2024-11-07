@@ -17,3 +17,7 @@ xxd -n __game_card -i ./fast-snake/target/wasm/release/build/snake.wasm > ./main
 ```
 
 xxd -n __game_card -i ./tankle-mbt/target/wasm/release/build/tankle.wasm > ./main/gamecard.c
+
+moon clean -C ./tankle-mbt
+moon build -C ./tankle-mbt --target wasm
+wasm-opt -all ./tankle-mbt/target/wasm/release/build/tankle.wasm -O4 -o ./tankle-mbt/target/wasm/release/build/tankle.wasm

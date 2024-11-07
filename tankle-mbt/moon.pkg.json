@@ -4,6 +4,9 @@
   ],
   "link": {
     "wasm": {
+        "flags": [
+            "-no-block-params"
+          ],
       "exports": [
         "start",
         "update"
