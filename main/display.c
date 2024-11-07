@@ -15,6 +15,8 @@
 
 // static uint32_t pixels[160*160];
 
+// #define PRINT_FPS 1
+
 static int viewportX = 0;
 static int viewportY = 0;
 static int viewportSize = 3 * 160;
@@ -24,6 +26,10 @@ extern wasm_module_inst_t wasm_module_inst;
 extern wasm_function_inst_t start;
 extern wasm_function_inst_t update;
 extern wasm_exec_env_t exec_env;
+
+int64_t frame_start = 0;
+int64_t frame_end = 0;
+int last_fps = 0;
 
 uint32_t stop = 0;
 
@@ -36,6 +42,7 @@ void w4_windowBoot() {
       printf("[WAMS4] stopping\n");
       break;
     }
+    frame_start = esp_timer_get_time() / 1000;
     t0 = esp_timer_get_time() / 1000;
     counter++;
     if (!wasm_module_inst || !start || !update || !exec_env) {
@@ -59,8 +66,10 @@ void w4_windowBoot() {
                        160 * (mouseY - viewportY) / viewportSize, mouseButtons);
     w4_runtimeUpdate();
     t1 = esp_timer_get_time() / 1000;
+#ifdef PRINT_FPS
     printf("loop %lld\n", t1 - t0);
     printf("FPS: %lf\n", 1.0 / (t1 - t0));
+#endif
   } while (1);
 }
 
@@ -93,6 +102,9 @@ void w4_windowComposite(const uint32_t* palette, const uint8_t* framebuffer) {
   uint16_t colors[4] = {convert(palette[0]), convert(palette[1]),
                         convert(palette[2]), convert(palette[3])};
 
+  char fps[4];
+  sprintf(fps, "%d", last_fps);
+  w4_runtimeText(fps, 140, 0);
   for (int n = 0; n < 160 * 160 / 4; ++n) {
     uint8_t quartet = framebuffer[n];
     int color1 = (quartet & 0b00000011) >> 0;
@@ -124,11 +136,17 @@ void w4_windowComposite(const uint32_t* palette, const uint8_t* framebuffer) {
     lcdDrawPixel(&dev, x, y, c4);
   }
   t1 = esp_timer_get_time() / 1000;
+#ifdef PRINT_FPS
   printf("Prepare data %lld\n", t1 - t0);
+#endif
   t0 = esp_timer_get_time() / 1000;
+  frame_end = esp_timer_get_time() / 1000;
+  last_fps = 1000 / (frame_end - frame_start);
   lcdDrawFinish(&dev);
   t1 = esp_timer_get_time() / 1000;
+#ifdef PRINT_FPS
   printf("Transmit data %lld\n", t1 - t0);
+#endif
 }
 
 TickType_t FillTest(TFT_t* dev, int width, int height) {

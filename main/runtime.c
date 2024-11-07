@@ -230,11 +230,11 @@ void w4_runtimeUpdate() {
   } else if (!(memory->systemFlags & SYSTEM_PRESERVE_FRAMEBUFFER)) {
     w4_framebufferClear();
   }
-  int64_t t0, t1;
-  t0 = esp_timer_get_time() / 1000;
+  //   int64_t t0, t1;
+  //   t0 = esp_timer_get_time() / 1000;
   w4_wasmCallUpdate();
-  t1 = esp_timer_get_time() / 1000;
-  printf("Update %lld\n", t1 - t0);
+  //   t1 = esp_timer_get_time() / 1000;
+  //   printf("Update %lld\n", t1 - t0);
   w4_apuTick();
   uint32_t palette[4] = {
       w4_read32LE(&memory->palette[0]),
