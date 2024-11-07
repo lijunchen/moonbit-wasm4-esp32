@@ -123,7 +123,7 @@ int card_length = 0;
 extern uint32_t stop;
 
 void uart_rx_task(void* pvParameter) {
-  uint8_t buf[128];
+  uint8_t buf[1024];
   while (1) {
     uint32_t current = 0;
     uint32_t total_size = 0;
@@ -147,14 +147,17 @@ void uart_rx_task(void* pvParameter) {
 
     if (type == 1234) {
       stop = 1;
+      int64_t t0 = esp_timer_get_time() / 1000;
       while (current < total_size) {
         int len =
-            uart_read_bytes(UART_NUM_0, buf, sizeof(buf), pdMS_TO_TICKS(1000));
+            uart_read_bytes(UART_NUM_0, buf, sizeof(buf), pdMS_TO_TICKS(100));
         if (len > 0) {
           memcpy(card_data + current - 8, buf, len);
           current += len;
         }
       }
+      int64_t t1 = esp_timer_get_time() / 1000;
+      printf("received %d bytes in %lld ms\n", total_size, t1 - t0);
       card_length = total_size - 8;
       card_data[card_length] = '\0';
       int checksum = 0;
