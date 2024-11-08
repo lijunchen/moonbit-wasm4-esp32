@@ -1,3 +1,6 @@
 [submodule "vendor/glfw"]
 	path = vendor/glfw
 	url = git@github.com:glfw/glfw.git
+[submodule "vendor/wasm-micro-runtime"]
+	path = vendor/wasm-micro-runtime
+	url = git@github.com:bytecodealliance/wasm-micro-runtime.git
