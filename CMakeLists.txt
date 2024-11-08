@@ -27,6 +27,7 @@ add_subdirectory(vendor/glfw)
 
 # Add your executable and source files
 add_executable(myapp
+    src/control.c
     src/display.c
     src/framebuffer.c
     src/gamecard.c

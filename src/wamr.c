@@ -204,51 +204,37 @@ void init_wamr() {
 
   bool wamr_init = false;
 
-  while (true) {
-    if (stop == 1) {
-      printf("[WAMR] wait restart signal\n");
-      continue;
-    }
-
-    if (exec_env) {
-      wasm_runtime_destroy_exec_env(exec_env);
-      exec_env = NULL;
-    }
-    if (exec_env2) {
-      wasm_runtime_destroy_exec_env(exec_env2);
-      exec_env2 = NULL;
-    }
-    if (wasm_module_inst) {
-      wasm_runtime_deinstantiate(wasm_module_inst);
-      wasm_module_inst = NULL;
-    }
-    if (wasm_module) {
-      wasm_runtime_unload(wasm_module);
-      wasm_module = NULL;
-    }
-    if (wamr_init) {
-      wasm_runtime_destroy();
-      wamr_init = false;
-    }
-
-    printf("In loop\n");
-    printf("Initialize WASM runtime\n");
-    /* Initialize runtime environment */
-    if (!wasm_runtime_full_init(&init_args)) {
-      printf("Init runtime failed.\n");
-      return;
-    }
-    wamr_init = true;
-
-    load_tinypong();
-    run_wasm4(NULL);
+  if (exec_env) {
+    wasm_runtime_destroy_exec_env(exec_env);
+    exec_env = NULL;
+  }
+  if (exec_env2) {
+    wasm_runtime_destroy_exec_env(exec_env2);
+    exec_env2 = NULL;
+  }
+  if (wasm_module_inst) {
+    wasm_runtime_deinstantiate(wasm_module_inst);
+    wasm_module_inst = NULL;
+  }
+  if (wasm_module) {
+    wasm_runtime_unload(wasm_module);
+    wasm_module = NULL;
+  }
+  if (wamr_init) {
+    wasm_runtime_destroy();
+    wamr_init = false;
   }
 
-  /* Clean up */
-  // wasm_runtime_deinstantiate(wasm_module_inst);
-  // wasm_runtime_unload(wasm_module);
-  // wasm_runtime_destroy();
-  // printf("WASM runtime destroyed.\n");
+  printf("In loop\n");
+  printf("Initialize WASM runtime\n");
+  /* Initialize runtime environment */
+  if (!wasm_runtime_full_init(&init_args)) {
+    printf("Init runtime failed.\n");
+    return;
+  }
+  wamr_init = true;
+
+  load_tinypong();
 }
 
 void* wamr_get_phy_memory() {
