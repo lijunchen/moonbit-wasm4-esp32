@@ -186,6 +186,12 @@ void uart_rx_task(void* pvParameter) {
       stop = 0;
 
       printf("\n");
+    } else if (type == 0x1122) {
+      int32_t payload = 0;
+      n = uart_read_bytes(UART_NUM_0, (uint8_t*)&payload, sizeof(payload),
+                          pdMS_TO_TICKS(1000));
+      printf("received 0x1122, payload: %d\n", payload);
+      set_player_state(0, (int8_t)payload);
     }
 
     vTaskDelay(10 / portTICK_PERIOD_MS);
@@ -206,7 +212,11 @@ void init_uart() {
 void app_main(void) {
   //   init_watch_dog();
   //   xTaskCreate(feed_watchdog, "feed_watchdog", 2048, NULL, 6, NULL);
+
+  printf("init uart\n");
+  vTaskDelay(100 / portTICK_PERIOD_MS);
   init_uart();
+  printf("init uart FINISHED\n");
 
   init_button();
   nvs_flash_init();
