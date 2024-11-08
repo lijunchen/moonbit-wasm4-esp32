@@ -104,15 +104,18 @@ void init_watch_dog() {
 void fillTest() {
   printf("Fill Red\n");
   lcdFillScreen(&dev, RED);
+  lcdDrawFinish(&dev);
   vTaskDelay(pdMS_TO_TICKS(100));
 
   printf("Fill Green\n");
   lcdFillScreen(&dev, GREEN);
+  lcdDrawFinish(&dev);
   vTaskDelay(pdMS_TO_TICKS(100));
 
   printf("Fill Blue\n");
   lcdFillScreen(&dev, BLUE);
-  vTaskDelay(pdMS_TO_TICKS(200));
+  lcdDrawFinish(&dev);
+  vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 #define BUF_SIZE (1024)
@@ -182,7 +185,7 @@ void uart_rx_task(void* pvParameter) {
       }
 
       vTaskDelay(100 / portTICK_PERIOD_MS);
-      //   fillTest();
+      fillTest();
       stop = 0;
 
       printf("\n");

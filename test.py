@@ -29,7 +29,7 @@ if not os.path.isfile(wasm_path):
     print(f"Error: File {wasm_path} not found.")
     exit(1)
 
-port = "/dev/cu.wchusbserial58A60725371"
+port = "/dev/cu.wchusbserial58750044301"
 # Open serial port
 ser = serial.Serial(
     port=port,
