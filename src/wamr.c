@@ -181,8 +181,6 @@ void load_tinypong() {
   exec_env2 = wasm_runtime_create_exec_env(wasm_module_inst, 10 * 1024);
 }
 
-char global_heap_buffer[384 * 1024];
-
 void init_wamr() {
   /* Setup variables for instantiating and running the wasm module */
 
@@ -191,9 +189,7 @@ void init_wamr() {
 
   /* Configure memory allocation */
   memset(&init_args, 0, sizeof(RuntimeInitArgs));
-  init_args.mem_alloc_type = Alloc_With_Pool;
-  init_args.mem_alloc_option.pool.heap_buf = global_heap_buffer;
-  init_args.mem_alloc_option.pool.heap_size = sizeof(global_heap_buffer);
+  init_args.mem_alloc_type = Alloc_With_System_Allocator;
 
   init_args.native_module_name = "env";
   init_args.native_symbols = native_symbols;

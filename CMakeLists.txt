@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(MyGLFWApp C)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 # Specify C standard
 set(CMAKE_C_STANDARD 11)

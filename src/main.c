@@ -5,6 +5,8 @@
 #include "runtime.h"
 #include "wamr.h"
 
+#include <sys/time.h>
+
 GLFWwindow* window = NULL;
 
 char card_data[48 * 1024];
@@ -70,6 +72,8 @@ int main(void) {
   w4_runtimeInit(memory, &disk);
 
   while (true) {
+    double timeStart = glfwGetTime();
+    double timeEnd = timeStart + 1.0 / 60.0;
     int state = 0;
     if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
       state |= W4_BUTTON_X;
@@ -91,7 +95,13 @@ int main(void) {
     }
     w4_runtimeSetGamepad(0, state);
 
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
     w4_runtimeUpdate();
+    gettimeofday(&end, NULL);
+    double elapsed_time =
+        (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec);
+    printf("w4_runtimeUpdate time taken: %f us\n", elapsed_time);
     // Prepare the texture from the framebuffer data
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WINDOW_WIDTH, WINDOW_HEIGHT, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, pixels);
@@ -114,6 +124,10 @@ int main(void) {
     // Swap buffers and poll events
     glfwSwapBuffers(window);
     glfwPollEvents();
+    double timeRemaining;
+    while ((timeRemaining = timeEnd - glfwGetTime()) > 0) {
+      glfwWaitEventsTimeout(timeRemaining);
+    }
   }
 
   // Clean up and exit
