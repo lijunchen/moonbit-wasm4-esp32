@@ -2,6 +2,6 @@
 #define GAMECARD_H
 
 const extern unsigned char __game_card[];
-unsigned int __game_card_len;
+extern unsigned int __game_card_len;
 
 #endif // GAMECARD_H

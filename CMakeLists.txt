@@ -7,8 +7,8 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_C_STANDARD 11)
 
 # Set WAMR build options
-set(WAMR_BUILD_PLATFORM "darwin")
-set(WAMR_BUILD_TARGET "AARCH64")
+set(WAMR_BUILD_PLATFORM "linux")
+set(WAMR_BUILD_TARGET "X86_64")
 set(WAMR_BUILD_INTERP 1)
 set(WAMR_BUILD_FAST_INTERP 1)
 set(WAMR_BUILD_AOT 1)
@@ -23,7 +23,7 @@ add_library(vmlib ${WAMR_RUNTIME_LIB_SOURCE})
 
 
 # Add GLFW as a subdirectory
-add_subdirectory(vendor/glfw)
+# add_subdirectory(vendor/glfw)
 
 # Add your executable and source files
 add_executable(myapp
@@ -38,7 +38,7 @@ add_executable(myapp
 )
 
 # Link WAMR libraries and GLFW
-target_link_libraries(myapp PRIVATE vmlib glfw)
+target_link_libraries(myapp PRIVATE vmlib m)
 
 # macOS specific: Link required system frameworks
 if (APPLE)

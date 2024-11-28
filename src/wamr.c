@@ -159,10 +159,53 @@ void load_tinypong() {
     return;
   }
 
-  printf("Instantiate the wasm module\n");
+  /* import type */
+  int32_t import_count = wasm_runtime_get_import_count(wasm_module);
+  printf("import count: %ld\n", import_count);
+  wasm_import_t import_type = {0};
+  int32_t import_memory_index = -1;
+  for (int i = 0; i < import_count; i++) {
+    wasm_runtime_get_import_type(wasm_module, i, &import_type);
+    if (import_type.kind == WASM_IMPORT_EXPORT_KIND_MEMORY) {
+      import_memory_index = i;
+      break;
+    }
+  }
 
-  wasm_module_inst = wasm_runtime_instantiate(wasm_module, 8 * 1024, 64 * 1024,
-                                              error_buf, sizeof(error_buf));
+  printf("import_memory_index: %ld\n", import_memory_index);
+
+  if (import_memory_index == -1) {
+    printf("No memory import found.\n");
+    goto unload_module;
+  }
+
+  /* host memory */
+  wasm_memory_type_t memory_type = import_type.u.memory_type;
+  wasm_memory_inst_t memory =
+      wasm_runtime_create_memory(wasm_module, memory_type);
+  if (!memory) {
+    printf("Create memory failed.\n");
+    goto unload_module;
+  }
+
+  /* import list */
+  WASMExternInstance import_list[10] = {0};
+  import_list[import_memory_index].module_name = "env";
+  import_list[import_memory_index].field_name = "memory";
+  import_list[import_memory_index].kind = WASM_IMPORT_EXPORT_KIND_MEMORY;
+  import_list[import_memory_index].u.memory = memory;
+
+  /* wasm instance */
+  InstantiationArgs inst_args = {
+      .default_stack_size = 8 * 1024,
+      .imports = import_list,
+      .import_count = 10,
+  };
+
+  printf("Instantiate the wasm module\n");
+  wasm_module_inst = wasm_runtime_instantiate_ex(wasm_module, &inst_args,
+                                                 error_buf, sizeof(error_buf));
+
   if (!wasm_module_inst) {
     printf("Failed to instantiate wasm module: %s\n", error_buf);
     wasm_runtime_unload(wasm_module);
@@ -179,6 +222,9 @@ void load_tinypong() {
   exec_env = wasm_runtime_create_exec_env(wasm_module_inst, 2 * 1024);
 
   exec_env2 = wasm_runtime_create_exec_env(wasm_module_inst, 10 * 1024);
+
+unload_module:
+  wasm_runtime_unload(wasm_module);
 }
 
 void init_wamr() {
@@ -234,7 +280,8 @@ void init_wamr() {
 }
 
 void* wamr_get_phy_memory() {
-  return wasm_runtime_addr_app_to_native(wasm_module_inst, 0);
+  wasm_memory_inst_t m = wasm_runtime_get_memory(wasm_module_inst, 0);
+  return wasm_memory_get_base_address(m);
 }
 
 void w4_wasmCallStart() {

@@ -1,4 +1,4 @@
-#include <GLFW/glfw3.h>
+// #include <GLFW/glfw3.h>
 
 #include <wasm_export.h>
 
@@ -19,7 +19,7 @@ int last_fps = 0;
 
 uint32_t stop = 0;
 
-extern GLFWwindow* window;
+// extern GLFWwindow* window;
 
 void w4_windowBoot() {
   int counter = 0;
